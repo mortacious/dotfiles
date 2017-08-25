@@ -491,6 +491,7 @@ set shell=/bin/bas
 
 " syntax highlighting {{{
   " call dein#add('PotatoesMaster/i3-vim-syntax')
+    call dein#add('rust-lang/rust.vim')
 
   " color
   set t_Co=256
@@ -611,8 +612,7 @@ set shell=/bin/bas
   " call dein#add('thinca/vim-visualstar')
   call dein#add('tomtom/tcomment_vim')
   " call dein#add('terryma/vim-expand-region')
-  " call dein#add('terryma/vim-multiple-cursors')
-  "call dein#add('chrisbra/NrrwRgn')
+  call dein#add('terryma/vim-multiple-cursors')
   "call dein#add('godlygeek/tabular', {'on_cmd': 'Tabularize'})
   call dein#add('jiangmiao/auto-pairs')
   " call dein#add('justinmk/vim-sneak') "{{{
@@ -742,10 +742,10 @@ set shell=/bin/bas
   "   endif
   " " }}}
 
-  " call dein#add('mbbill/undotree', {'on_cmd': 'UndotreeToggle'}) " {{{
-  "   let g:undotree_WindowLayout = 2
-  "   let g:undotree_SetFocusWhenToggle = 1
-  " " }}}
+  call dein#add('mbbill/undotree', {'on_cmd': 'UndotreeToggle'}) " {{{
+     let g:undotree_WindowLayout = 2
+     let g:undotree_SetFocusWhenToggle = 1
+  " }}}
 
   " call dein#add('vim-scripts/EasyGrep', {'on_cmd': 'GrepOptions'}) " {{{
   "   let g:EasyGrepRecursive = 1
@@ -1506,9 +1506,16 @@ endif
 
     "let g:lmap.a = { 'name' : '+applications' }
 
-    "nnoremap <silent> <SID>undotree-toggle :UndotreeToggle<CR>
-    "nmap <Leader>au <SID>undotree-toggle
+    nnoremap <silent> <SID>undotree-toggle :UndotreeToggle<CR>
+    nmap <Leader>au <SID>undotree-toggle
 
+    let s:menus.applications = {
+    \ 'description' : 'Applications',
+    \}
+    let s:menus.applications.command_candidates = [
+    \['▷ Undo Tree            (UndoTree)                                ⌘ <Leader>au', 'UndotreeToggle'],
+    \] " Append ' --' after log to get commit info commit buffers
+    nnoremap <silent> <SID>files-menu :Denite menu:files<CR>
     "nnoremap <SID>gdb :ConqueGdbVSplit<CR>
     "nmap <Leader>ag <SID>gdb
 
