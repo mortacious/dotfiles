@@ -1,4 +1,4 @@
-set shell=/bin/bas
+set shell=/bin/bash
 
 
 " Leader key {{{
@@ -6,10 +6,6 @@ set shell=/bin/bas
   let mapleader = ' '
   let g:mapleader = ' '
 "}}}
-
-
-
-
 
 " functions {{{
 
@@ -442,6 +438,14 @@ set shell=/bin/bas
       return lightline#statusline(0)
     endfunction
 
+    function! s:filtered_lightline_call(funcname)
+        if bufname('%') == '__CS__'
+            return
+        endif
+        execute 'call lightline#' . a:funcname . '()'
+    endfunction
+
+
     "let g:tagbar_status_func = 'TagbarStatusFunc'
 
     "function! TagbarStatusFunc(current, sort, fname, ...) abort
@@ -715,21 +719,18 @@ set shell=/bin/bas
         \ ]
   " }}}
   " " Ale {{{
-  "   call dein#add('w0rp/ale')
-  "   let g:ale_statusline_format = ['⨉ %d', '⚠ %d', '✔︎']
-  "   let g:ale_sign_error = '⨉'
-  "   let g:ale_sign_warning = '⚠'
-  " " }}}
-
-  " call dein#add('zhaocai/GoldenView.Vim', {'on_map': '<Plug>ToggleGoldenViewAutoResize'}) "{{{
-  "   let g:goldenview__enable_default_mapping = 0
+     call dein#add('w0rp/ale')
+     let g:ale_statusline_format = ['⨉ %d', '⚠ %d', '✔︎']
+     let g:ale_sign_error = '⨉'
+     let g:ale_sign_warning = '⚠'
+  " }}}
   "}}}
 
-  " call dein#add('vim-scripts/Conque-GDB', {'on_cmd': ['ConqueGdb','ConqueGdbTab',
-  "     \ 'ConqueGdbVSplit','ConqueGdbSplit','ConqueTerm','ConqueTermTab',
-  "     \ 'ConqueTermVSplit','ConqueTermSplit']}) "{{{
-  "   let g:ConqueGdb_Leader = '\'
-  " "}}}
+  call dein#add('vim-scripts/Conque-GDB', {'on_cmd': ['ConqueGdb','ConqueGdbTab',
+       \ 'ConqueGdbVSplit','ConqueGdbSplit','ConqueTerm','ConqueTermTab',
+       \ 'ConqueTermVSplit','ConqueTermSplit']}) "{{{
+     let g:ConqueGdb_Leader = '\'
+  "}}}
 
   call dein#add('yonchu/accelerated-smooth-scroll')
 " }}}
@@ -876,15 +877,24 @@ set shell=/bin/bas
   "   let g:buffergator_sort_regime = "mru"
   "   let g:buffergator_mru_cycle_loop = 0
   " "}}}
+  " }}}
+  "call dein#add('vim-ctrlspace/vim-ctrlspace') " {{{
+  "  if executable("ag")
+  "      let g:CtrlSpaceGlobCommand = 'ag -l --nocolor -g ""'
+  "  endif
+  "  let g:CtrlSpaceDefaultMappingKey = "<Leader>c"
+    "let g:CtrlSpaceUseMouseAndArrowsInTerm = 1
+  "  let g:CtrlSpaceUseTabline = 0
+  " }}}
 " }}}
 
 " Python {{{
-  " call dein#add('klen/python-mode', {'on_ft': 'python'}) " {{{
+  "call dein#add('klen/python-mode', {'on_ft': 'python'}) " {{{
   "   let g:pymode_rope = 0
-  " " }}}
-  " call dein#add('davidhalter/jedi-vim', {'on_ft': 'python'}) " {{{
+  " }}}
+  "call dein#add('davidhalter/jedi-vim', {'on_ft': 'python'}) " {{{
   "   let g:jedi#popup_on_dot = 0
-  " " }}}
+  " }}}
 " }}}
 
 " SCM {{{
@@ -904,153 +914,6 @@ set shell=/bin/bas
   call dein#add('airblade/vim-gitgutter')
 " }}}
 
-" Denite {{{
-"  function! s:OnDenitePostSource() abort " {{{
-
-"     " change file_rec command.
-"     "call denite#custom#var('file_rec', 'command',
-"     "    \ ['ag', '--follow', '--nocolor', '--nogroup', '-g', ''])
-
-"     " change mappings " {{{
-"       call denite#custom#map(
-"           \ 'insert',
-"           \ '<C-n>',
-"           \ '<denite:move_to_next_line>',
-"           \ 'noremap'
-"           \)
-"       call denite#custom#map(
-"           \ 'insert',
-"           \ '<C-p>',
-"           \ '<denite:move_to_previous_line>',
-"           \ 'noremap'
-"           \)
-"     " }}}
-
-"     " change grep " {{{
-"       if executable('rg')
-"         call denite#custom#var('grep', 'command', ['rg'])
-"         call denite#custom#var('grep', 'default_opts',
-"             \ ['-i', '--vimgrep', '--no-heading'])
-"         call denite#custom#var('grep', 'recursive_opts', [])
-"         call denite#custom#var('grep', 'pattern_opt', ['--regexp'])
-"         call denite#custom#var('grep', 'separator', ['--'])
-"         call denite#custom#var('grep', 'final_opts', [])
-"       elseif executable('sift')
-"         call denite#custom#var('grep', 'command', ['sift'])
-"         call denite#custom#var('grep', 'default_opts',
-"             \ ['-i', '--no-color'])
-"         call denite#custom#var('grep', 'recursive_opts', [])
-"         call denite#custom#var('grep', 'pattern_opt', [])
-"         call denite#custom#var('grep', 'separator', ['--'])
-"         call denite#custom#var('grep', 'final_opts', [])
-"       elseif executable('ag')
-"         call denite#custom#var('grep', 'command', ['ag'])
-"         call denite#custom#var('grep', 'default_opts',
-"             \ ['-i', '--vimgrep', '--hidden',
-"             \ '--ignore', '''.hg''', '--ignore', '''.svn''',
-"             \ '--ignore', '''.git''', '--ignore', '''.bzr'''])
-"         call denite#custom#var('grep', 'recursive_opts', [])
-"         call denite#custom#var('grep', 'pattern_opt', [])
-"         call denite#custom#var('grep', 'separator', ['--'])
-"         call denite#custom#var('grep', 'final_opts', [])
-"       elseif executable('pt')
-"         call denite#custom#var('grep', 'command', ['pt'])
-"         call denite#custom#var('grep', 'default_opts',
-"             \ ['--nogroup', '--nocolor', '--smart-case'])
-"         call denite#custom#var('grep', 'recursive_opts', [])
-"         call denite#custom#var('grep', 'pattern_opt', [])
-"         call denite#custom#var('grep', 'separator', ['--'])
-"         call denite#custom#var('grep', 'final_opts', [])
-"       elseif executable('ack')
-"         call denite#custom#var('grep', 'command', ['ack'])
-"         call denite#custom#var('grep', 'default_opts',
-"             \ ['-i', '-H', '--nopager', '--noheading',
-"             \ '--nocolor', '--nogroup', '--column'])
-"         call denite#custom#var('grep', 'recursive_opts', [])
-"         call denite#custom#var('grep', 'pattern_opt', ['--match'])
-"         call denite#custom#var('grep', 'separator', ['--'])
-"         call denite#custom#var('grep', 'final_opts', [])
-"       endif
-"     " }}}
-
-"     " change default prompt
-"     call denite#custom#option('default', 'prompt', '')
-
-"     " change ignore_globs
-"     call denite#custom#filter('matcher_ignore_globs', 'ignore_globs',
-"         \ split(&wildignore, ','))
-"     "call denite#custom#filter('matcher_ignore_globs', 'ignore_globs', [
-"     "    \ '*~', '*.o', 'core.*', '*.exe', '.git/', '.hg/', '.svn/',
-"     "    \ '.DS_Store', '*.pyc', '*.sw[po]', '*.class',
-"     "    \ '*.tags', 'tags', 'tags-*', 'cscope.*', '*.taghl',
-"     "    \ '.ropeproject/', '__pycache__/', 'venv/',
-"     "    \ '*.min.*', 'images/', 'img/', 'fonts/'])
-
-"     " change matchers
-"     call denite#custom#source('file_rec,file_mru', 'matchers',
-"         \ ['matcher_ignore_globs'])
-"     call denite#custom#source('bookmark,buffer,colorscheme,grep,help,line,outline',
-"         \ 'matchers', ['matcher_fuzzy'])
-
-"     " change sorters
-"     call denite#custom#source('file_rec', 'sorters', ['sorter_rank'])
-"   endfunction " }}}
-
-"   function! s:OnUnitePostSource() abort " {{{
-
-"     " change grep " {{{
-"       if executable('rg')
-"         let g:unite_source_grep_command = 'rg'
-"         let g:unite_source_grep_default_opts = '-i --vimgrep --no-heading'
-"         let g:unite_source_grep_recursive_opt = ''
-"       elseif executable('sift')
-"         let g:unite_source_grep_command = 'sift'
-"         let g:unite_source_grep_default_opts = '-i --no-color'
-"         let g:unite_source_grep_recursive_opt = ''
-"       elseif executable('ag')
-"         let g:unite_source_grep_command = 'ag'
-"         let g:unite_source_grep_default_opts =
-"             \ '-i --vimgrep --hidden --ignore ''.hg'' --ignore ''.svn'' --ignore ''.git'' --ignore ''.bzr'''
-"         let g:unite_source_grep_recursive_opt = ''
-"       elseif executable('pt')
-"         let g:unite_source_grep_command = 'pt'
-"         let g:unite_source_grep_default_opts = '--nogroup --nocolor --smart-case'
-"         let g:unite_source_grep_recursive_opt = ''
-"       elseif executable('ack')
-"         let g:unite_source_grep_command = 'ack'
-"         let g:unite_source_grep_default_opts =
-"             \ '-i -H --nopager --noheading --nocolor --nogroup --column'
-"         let g:unite_source_grep_recursive_opt = ''
-"       endif
-"     "}}}
-
-"     call unite#filters#matcher_default#use(['matcher_fuzzy'])
-"     call unite#filters#sorter_default#use(['sorter_rank'])
-
-"     " change ignore_globs
-"     call unite#custom#source(
-"         \ 'file,file/async,file_rec,file_rec/async,file_mru', 'ignore_globs',
-"         \ split(&wildignore, ','))
-"     "call unite#custom#source('file,file/async,file_rec,file_rec/async', 'ignore_pattern',
-"     "    \ '~$\|\.o$\|^core\.\|\.exe$\|^\.git/$\|^\.hg/$\|^\.svn/$\|' .
-"     "    \ '^\.DS_Store$\|\.pyc$\|\.swp$\|\.swo$\|\.class$\|' .
-"     "    \ '\.tags$\|^tags$\|^tags-\|^cscope\.\|\.taghl$\|' .
-"     "    \ '^\.ropeproject/$\|^__pycache__/$\|^venv/$\|' .
-"     "    \ '\.min\.\|^images/$\|^img/$\|^fonts/$')
-
-"     call unite#custom#profile('default', 'context', {
-"         \ 'start_insert': 1,
-"         \ })
-"         "\ 'direction': 'botright',
-
-"   endfunction " }}}
-
-"   function! s:UniteSettings() " {{{
-"     nmap <buffer> Q <Plug>(unite_exit)
-"     nmap <buffer> <Esc> <Plug>(unite_exit)
-"     imap <buffer> <Esc> <Plug>(unite_exit)
-"   endfunction " }}}
-
   call dein#add('Shougo/denite.nvim') " {{{
     set rtp+=~/.config/nvim/plugins/repos/github.com/Shougo/denite.nvim/
     call denite#custom#map('insert', '<Down>', '<denite:move_to_next_line>', 'noremap')
@@ -1058,43 +921,7 @@ set shell=/bin/bas
     let s:menus = {}
     call denite#custom#var('menu', 'menus', s:menus)
   " }}}
-"       \ 'hook_post_source': function('s:OnDenitePostSource'),
-"       \ 'hook_done_update': function('OnDoneUpdate')}) " {{{
-"     " need to execute the `:UpdateRemotePlugins` and restart for the first time
-"   " }}}
-"   call dein#add('Shougo/vimproc.vim', {'build': 'make'})
-"   call dein#add('Shougo/unite.vim', {'depends': 'Shougo/vimproc.vim',
-"       \ 'hook_post_source': function('s:OnUnitePostSource')}) " {{{
-"     let g:unite_data_directory = GetCacheDir('unite')
-
-"    "" autocmd FileType unite call s:UniteSettings()
-"   " }}}
-"   " call dein#add('osyo-manga/unite-airline_themes', {'depends': 'Shougo/unite.vim'})
-"   " call dein#add('ujihisa/unite-colorscheme', {'depends': 'Shougo/unite.vim'})
-"   call dein#add('tsukkee/unite-tag', {'depends': 'Shougo/unite.vim'})
-"   call dein#add('ozelentok/denite-gtags', {'depends': 'Shougo/denite.vim'})
-"   call dein#add('Shougo/unite-outline', {'depends': 'Shougo/unite.vim'})
-"   call dein#add('Shougo/unite-help', {'depends': 'Shougo/unite.vim'})
-"   call dein#add('Shougo/junkfile.vim', {'depends': 'Shougo/unite.vim', 'on_cmd': 'JunkfileOpen'}) " {{{
-"     let g:junkfile#directory = GetCacheDir('junk')
-"   " }}}
-
-"   call dein#add('Shougo/neomru.vim', {
-"     \ 'hook_done_update': function('OnDoneUpdate')}) " {{{
-"   " need to execute the `:UpdateRemotePlugins` and restart for the first time
-"   let g:neomru#file_mru_path = GetCacheDir('neomru') .
-"       \ g:path_separator . 'file'
-"   let g:neomru#directory_mru_path = GetCacheDir('neomru') .
-"       \ g:path_separator . 'directory'
-"   " }}}
-"   call dein#add('Shougo/neoyank.vim', {
-"       \ 'hook_done_update': function('OnDoneUpdate')}) " {{{
-"     " need to execute the `:UpdateRemotePlugins` and restart for the first time
-"     let g:neoyank#file = GetCacheDir('neoyank') .
-"         \ g:path_separator . 'history_yank'
-"   " }}}
-
-" " }}}
+" }}}
 
 " Building {{{
   " call dein#add('neomake/neomake')
@@ -1106,18 +933,17 @@ endif
 
 
 " Autocommands {{{
-  " augroup nvim_edit
-  "   autocmd!
+ augroup nvim_edit
+         autocmd!
 
-  "   " go back to previous position of cursor if any
-  "   autocmd BufReadPost *
-  "       \ if line("'\"") > 0 && line("'\"") <= line("$") |
-  "       \   exe 'normal! g`"zvzz' |
-  "       \ endif
-
-  "   " quickfix window always on the bottom taking the whole horizontal space
-  "   autocmd FileType qf wincmd J
-  " augroup end
+         " go back to previous position of cursor if any
+         autocmd BufReadPost *
+            \ if line("'\"") > 0 && line("'\"") <= line("$") |
+            \   exe 'normal! g`"zvzz' |
+            \ endif
+  " quickfix window always on the bottom taking the whole horizontal space
+     autocmd FileType qf wincmd J
+ augroup end
 
 
   augroup nvim_map
@@ -1211,35 +1037,6 @@ endif
   "   echo "// tabpagewinnr(n, '#')= tab n's previous window number"
 
   " endfunction
-
-  " function! s:Indent4Space()
-  "   set expandtab
-  "   set tabstop=4
-  "   set softtabstop=4
-  "   set shiftwidth=4
-  " endfunction
-
-  " function! s:Indent2Space()
-  "   set expandtab
-  "   set tabstop=2
-  "   set softtabstop=2
-  "   set shiftwidth=2
-  " endfunction
-
-  " function! s:Indent4Tab()
-  "   set noexpandtab
-  "   set tabstop=4
-  "   set softtabstop=4
-  "   set shiftwidth=4
-  " endfunction
-
-  " function! s:Indent2Tab()
-  "   set noexpandtab
-  "   set tabstop=2
-  "   set softtabstop=2
-  "   set shiftwidth=2
-  " endfunction
-
 "}}}
 
 " other useful functions {{{
@@ -1270,92 +1067,43 @@ endif
 
   " highlight all instances of word under cursor, when idle.
   " useful when studying strange source code.
-  " function! <SID>AutoHighlightToggle() " {{{
-  "   let @/ = ''
-  "   if exists('#auto_highlight')
-  "     autocmd! auto_highlight
-  "     augroup! auto_highlight
-  "     setlocal updatetime=4000
-  "     "echo 'Highlight current word: off'
-  "     return 0
-  "   else
-  "     augroup auto_highlight
-  "       autocmd!
-  "       " 3match conflicts with airline
-  "       autocmd CursorHold * silent! execute printf('2match WarningMsg /\<%s\>/', expand('<cword>'))
-  "     augroup end
-  "     setlocal updatetime=20
-  "     "echo 'Highlight current word: on'
-  "     return 1
-  "   endif
-  " endfunction " }}}
-
-  " function! <SID>ListToggle(bufname, pfx) " {{{
-  "   let buflist = GetBufferList()
-  "   for bufnum in map(filter(split(buflist, '\n'), 'v:val =~ "' . a:bufname . '"'), 'str2nr(matchstr(v:val, "\\d\\+"))')
-  "     if bufwinnr(bufnum) != -1
-  "       execute a:pfx . 'close'
-  "       return
-  "     endif
-  "   endfor
-  "   if a:pfx ==# 'l' && len(getloclist(0)) == 0
-  "     echohl ErrorMsg
-  "     echo "Location List is Empty."
-  "     return
-  "   endif
-  "   let winnr = winnr()
-  "   execute a:pfx . 'window'
-  "   if winnr() != winnr
-  "     wincmd p
-  "   endif
-  " endfunction " }}}
-
-  " " toggle just text
-  " function! <SID>JustTextToggle() " {{{
-  "   if !exists('b:just_text')
-  "     let b:just_text = 0
-  "   endif
-  "   if b:just_text == 0
-  "     setlocal paste
-  "     setlocal nolist
-  "     setlocal nonumber
-  "     let b:just_text = 1
-  "     if exists('g:loaded_signify')
-  "       execute 'silent! SignifyDisable<CR>'
-  "     endif
-  "     echo 'Just text: on'
-  "     sign unplace *
-  "     return 0
-  "   else
-  "     setlocal nopaste
-  "     setlocal list
-  "     setlocal number
-  "     let b:just_text = 0
-  "     if exists('g:loaded_signify')
-  "       execute 'silent! SignifyEnable<CR>'
-  "     endif
-  "     echo 'Just text: off'
-  "     return 1
-  "   endif
-  " endfunction " }}}
+   function! <SID>AutoHighlightToggle() " {{{
+     let @/ = ''
+     if exists('#auto_highlight')
+       autocmd! auto_highlight
+       augroup! auto_highlight
+       setlocal updatetime=4000
+       echo 'Highlight current word: off'
+       return 0
+     else
+       augroup auto_highlight
+          autocmd!
+          " 3match conflicts with airline
+          autocmd CursorHold * silent! execute printf('2match WarningMsg /\<%s\>/', expand('<cword>'))
+          augroup end
+          setlocal updatetime=20
+          " echo 'Highlight current word: on'
+          return 1
+     endif
+   endfunction " }}}
 
   " maximize or restore current window in split structure
   " <http://vim.wikia.com/wiki/Maximize_window_and_return_to_previous_split_structure>
-  " function! <SID>MaximizeToggle()
-  "   if exists('s:maximize_session')
-  "     exec "source " . s:maximize_session
-  "     call delete(s:maximize_session)
-  "     unlet s:maximize_session
-  "     let &hidden = s:maximize_hidden_save
-  "     unlet s:maximize_hidden_save
-  "   else
-  "     let s:maximize_hidden_save = &hidden
-  "     let s:maximize_session = tempname()
-  "     set hidden
-  "     exec "mksession! " . s:maximize_session
-  "     only
-  "   endif
-  " endfunction
+   function! <SID>MaximizeToggle()
+     if exists('s:maximize_session')
+       exec "source " . s:maximize_session
+       call delete(s:maximize_session)
+       unlet s:maximize_session
+       let &hidden = s:maximize_hidden_save
+       unlet s:maximize_hidden_save
+     else
+       let s:maximize_hidden_save = &hidden
+       let s:maximize_session = tempname()
+       set hidden
+       exec "mksession! " . s:maximize_session
+       only
+     endif
+   endfunction
 
   function! s:WriteCmdLine(str)
     execute "menu Foo.Bar :" . a:str
@@ -1398,15 +1146,16 @@ endif
 " }}}
 
 " mappings {{{
-
   " maximize or restore current window in split structure
   noremap <C-w>O :call <SID>MaximizeToggle()<CR>
   " noremap <C-w><C-o> :call <SID>MaximizeToggle()<CR>
 
   " remap arrow keys
   nmap h :bprev<CR>
+  nmap <S-Left> :bprev<CR>
   " :call LightLineBufferline()<CR>:call lightline#update()<CR>
   nmap l :bnext<CR>
+  nmap <S-Right> :bnext<CR>
   " :call LightLineBufferline()<CR>:call lightline#update()<CR>
   "nnoremap <Up> :tabnext<CR>
   "nnoremap <Down> :tabprev<CR>
@@ -1737,13 +1486,14 @@ endif
     " nmap <Leader>sl <SID>grep-last
 
     " " replace specific content
-    " nnoremap <SID>replace-in-file :%s/\<<C-r>=expand("<cword>")<CR>\>/<C-r>=expand("<cword>")<CR>/g<Left><Left>
-    " nmap <Leader>sr <SID>replace-in-file
+    nnoremap <SID>replace-in-file :%s/\<<C-r>=expand("<cword>")<CR>\>/<C-r>=expand("<cword>")<CR>/g<Left><Left>
+    nmap <Leader>sr <SID>replace-in-file
 
     " replace the selected text
     vnoremap <SID>replace-in-file :call <SID>VisualSelection('replace')<CR>
     vmap <Leader>sr <SID>replace-in-file
 
+    nmap <Leader>sR :%s///g<Left><Left><Left>
     " if dein#is_sourced('denite.nvim')
     "   nnoremap <silent> <SID>denite-cursorword :<C-u>DeniteCursorWord -no-quit -auto-resize -buffer-name=search grep:.<CR>
     "   nmap <Leader>ss <SID>denite-cursorword
@@ -1760,11 +1510,6 @@ endif
        nmap <Leader>sta <SID>create-tags
        nmap <Leader>stv <SID>remove-tags
     endif
-    " elseif dein#is_sourced('vim-dispatch')
-    "   nnoremap <SID>create-tags :Dispatch gtags;cscope -Rbq;ctags -R<CR>
-    "   nnoremap <SID>remove-tags :Dispatch rm tags;rm cscope.in.out;rm cscope.out;rm cscope.po.out;rm GTAGS;rm GRTAGS;rm GPATH<CR>
-    " endif
-    " 
 
     " " cscope
     " if has("cscope")
@@ -1858,15 +1603,15 @@ endif
     " let g:lmap.t.h = { 'name' : '+highlight' }
 
     " "nnoremap <SID>automatic-symbol-highlight :if <SID>AutoHighlightToggle()<Bar>set hlsearch<Bar>endif<CR>
-    " nnoremap <SID>automatic-symbol-highlight :call <SID>AutoHighlightToggle()<CR>
-    " nmap <Leader>tha <SID>automatic-symbol-highlight
-    " call <SID>AutoHighlightToggle()
+     nnoremap <SID>automatic-symbol-highlight :call <SID>AutoHighlightToggle()<CR>
+     nmap <Leader>th <SID>automatic-symbol-highlight
+     call <SID>AutoHighlightToggle()
 
     " nmap <silent> <SID>indent-guides <Plug>IndentGuidesToggle
     " nmap <Leader>ti <SID>indent-guides
 
-    " nnoremap <silent> <SID>tabbar :TagbarToggle<CR>
-    " nmap <Leader>tt <SID>tabbar
+     nnoremap <silent> <SID>tabbar :TagbarToggle<CR>
+     nmap <Leader>tt <SID>tabbar
 
     " nmap <silent> <SID>golden-ratio <Plug>ToggleGoldenViewAutoResize
     " nmap <Leader>tg <SID>golden-ratio
@@ -2134,18 +1879,17 @@ endif
 
 
 " Search and Replace
-" nmap <Leader>s :%s//g<Left><Left>
 
 " Relative numbering
-" function! NumberToggle()
-"    if(&relativenumber == 1)
-"        set nornu
-"        set number
-"    else
-"        set rnu
-"    endif
-" endfunc
+  function! NumberToggle()
+    if(&relativenumber == 1)
+        set nornu
+        set number
+    else
+        set rnu
+    endif
+  endfunc
 
 " Toggle between normal and relative numbering.
-" nnoremap <leader>r :call NumberToggle()<cr>
+  nnoremap <leader>r :call NumberToggle()<cr>
 " nnoremap Q @q   " Use Q to execute default register.
