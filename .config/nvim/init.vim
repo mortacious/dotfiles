@@ -8,26 +8,31 @@ set shell=/bin/bash
 "}}}
 
 " functions {{{
+  function! Preserve(command) " {{{
+	    " preparation: save last search and cursor position
+	    let _s = @/
+	    let l = line(".")
+  endfunction " }}}
 
-  function! GetDir(suffix) "{{{
+  function! GetDir(suffix) " {{{
     return resolve(expand(s:nvim_dir . g:path_separator . a:suffix))
   endfunction "}}}
 
-  function! GetCacheDir(suffix) "{{{
+  function! GetCacheDir(suffix) " {{{
     return resolve(expand(s:cache_dir . g:path_separator . a:suffix))
   endfunction "}}}
 
-  function! StripTrailingWhitespace() "{{{
+  function! StripTrailingWhitespace() " {{{
     call Preserve("%s/\\s\\+$//e")
   endfunction "}}}
 
-  function! s:EnsureExists(path) "{{{
+  function! s:EnsureExists(path) " {{{
     if !isdirectory(expand(a:path))
       call mkdir(expand(a:path))
     endif
   endfunction "}}}
 
-  function! s:AddTags(path) "{{{
+  function! s:AddTags(path) " {{{
     for f in split(glob(a:path . g:path_separator . '*.tags'), '\n')
       execute 'set tags+=' . f
     endfor
@@ -421,23 +426,6 @@ set shell=/bin/bash
       endif
     endfunction
 
-    let g:ctrlp_status_func = {
-        \ 'main': 'CtrlPStatusFunc_1',
-        \ 'prog': 'CtrlPStatusFunc_2',
-        \ }
-
-    function! CtrlPStatusFunc_1(focus, byfname, regex, prev, item, next, marked)
-      let g:lightline.ctrlp_regex = a:regex
-      let g:lightline.ctrlp_prev = a:prev
-      let g:lightline.ctrlp_item = a:item
-      let g:lightline.ctrlp_next = a:next
-      return lightline#statusline(0)
-    endfunction
-
-    function! CtrlPStatusFunc_2(str)
-      return lightline#statusline(0)
-    endfunction
-
     function! s:filtered_lightline_call(funcname)
         if bufname('%') == '__CS__'
             return
@@ -445,31 +433,6 @@ set shell=/bin/bash
         execute 'call lightline#' . a:funcname . '()'
     endfunction
 
-
-    "let g:tagbar_status_func = 'TagbarStatusFunc'
-
-    "function! TagbarStatusFunc(current, sort, fname, ...) abort
-    ""  let g:lightline.fname = a:fname
-    ""  return lightline#statusline(0)
-    "endfunction
-
-    " augroup AutoSyntastic
-    "   autocmd!
-    "   autocmd BufWritePost *.c,*.cpp call s:syntastic()
-    " augroup END
-    " function! s:syntastic()
-    "   if g:navim_settings.syntaxcheck_plugin ==# 'syntastic'
-    "     SyntasticCheck
-    "   endif
-    "   if g:navim_settings.statusline_plugin ==# 'lightline'
-    "     call lightline#update()
-    "   endif
-    " endfunction
-
-    " disable overwriting the statusline forcibly by other plugins
-    "let g:unite_force_overwrite_statusline = 0
-    "let g:vimfiler_force_overwrite_statusline = 0
-    "let g:vimshell_force_overwrite_statusline = 0
   " }}}
 
   call dein#add('taohex/lightline-buffer', {'depends': 'itchyny/lightline.vim'})
@@ -553,10 +516,6 @@ set shell=/bin/bash
   call dein#add('tiagofumo/vim-nerdtree-syntax-highlight')
 " }}}  
 
-
-
-
-
 " " C/C++ Stuff {{{
 "   call dein#add('vim-scripts/a.vim', {'on_ft': ['c','cpp','cc']})
 "   call dein#add('vim-scripts/c.vim', {'on_ft': ['c','cpp','cc']}) " {{{
@@ -629,16 +588,17 @@ set shell=/bin/bash
     let g:indent_guides_start_level = 1
     let g:indent_guides_guide_size = 1
     let g:indent_guides_enable_on_vim_startup = 1
+    let g:indent_guides_exclude_filetypes = ['help', 'startify', 'man', 'rogue', 'fzf']
+
     " let g:indent_guides_color_change_percent = 3
-  "}}}
+  " }}}
 " }}}
 
 " Tags & GDB {{{
-" run `:UpdateTypesFile` to highlight ctags symbols
-  " call dein#add('vim-scripts/TagHighlight')
-  " call dein#add('vim-scripts/gtags.vim')
+  " run `:UpdateTypesFile` to highlight ctags symbols
+  call dein#add('vim-scripts/TagHighlight')
+  call dein#add('vim-scripts/gtags.vim')
   " call dein#add('vim-scripts/gdbmgr')
-  " call dein#add('majutsushi/tagbar')
 " }}}
 
 " tmux {{{
@@ -663,19 +623,11 @@ set shell=/bin/bash
 
 " Misc {{{
   " call dein#add('xolox/vim-misc')
-  " call dein#add('xolox/vim-session') "{{{
-  "   let g:session_directory = GetCacheDir('sessions')
-  "   let g:session_autoload = 'no'
-  "   let g:session_autosave = 'no'
-  " " }}}
-  " call dein#add('mbbill/fencview', {'on_cmd': ['FencView','FencAutoDetect']}) " {{{
-  " let g:fencview_autodetect = 0
-  " let g:fencview_checklines = 100
-  " let g:fencview_auto_patterns = '*'
+  call dein#add('mbbill/fencview', {'on_cmd': ['FencView','FencAutoDetect']}) " {{{
+   let g:fencview_autodetect = 0
+   let g:fencview_checklines = 100
+   let g:fencview_auto_patterns = '*'
   " }}}
-
-  " call dein#add('kana/vim-vspec')
-  " call dein#add('tpope/vim-scriptease', {'on_ft': 'vim'})
   call dein#add('jtratner/vim-flavored-markdown', {'on_ft': ['markdown','ghmarkdown']})
   if executable('instant-markdown-d')
     call dein#add('suan/vim-instant-markdown', {'on_ft': ['markdown','ghmarkdown']})
@@ -690,19 +642,6 @@ set shell=/bin/bash
 
     let g:startify_custom_header = [
         \ ' Neovim',
-        \ '',
-        \ ' <Space>ff   go to files',
-        \ ' <Space>bb   select from buffers',
-        \ ' <Space>ss   recursively search all files for matching text',
-        \ ' <Space>fr   select from MRU',
-        \ ' <Space>fm   go to anything (files, buffers, MRU, bookmarks)',
-        \ ' <Space>jc   lists the references or definitions of a word',
-        \ ' <Space>ft   toggle file explorer',
-        \ ' <Space>tt   toggle tagbar',
-        \ ' <Space>tl   toggle quickfix list',
-        \ ' <Space>au   toggle undo tree',
-        \ ' <Space>ag   gdb',
-        \ '',
         \ ]
     let g:startify_custom_footer = [
         \ ]
@@ -726,11 +665,11 @@ set shell=/bin/bash
   " }}}
   "}}}
 
-  call dein#add('vim-scripts/Conque-GDB', {'on_cmd': ['ConqueGdb','ConqueGdbTab',
-       \ 'ConqueGdbVSplit','ConqueGdbSplit','ConqueTerm','ConqueTermTab',
-       \ 'ConqueTermVSplit','ConqueTermSplit']}) "{{{
-     let g:ConqueGdb_Leader = '\'
-  "}}}
+  "call dein#add('vim-scripts/Conque-GDB', {'on_cmd': ['ConqueGdb','ConqueGdbTab',
+  ""     \ 'ConqueGdbVSplit','ConqueGdbSplit','ConqueTerm','ConqueTermTab',
+  ""     \ 'ConqueTermVSplit','ConqueTermSplit']}) "{{{
+  ""   let g:ConqueGdb_Leader = '\'
+  " }}}
 
   call dein#add('yonchu/accelerated-smooth-scroll')
 " }}}
@@ -748,43 +687,32 @@ set shell=/bin/bash
      let g:undotree_SetFocusWhenToggle = 1
   " }}}
 
-  " call dein#add('vim-scripts/EasyGrep', {'on_cmd': 'GrepOptions'}) " {{{
-  "   let g:EasyGrepRecursive = 1
-  "   let g:EasyGrepAllOptionsInExplorer = 1
-  "   let g:EasyGrepCommand = 1
-  " " }}}
-
-  " call dein#add('ctrlpvim/ctrlp.vim') " {{{
-  "   let g:ctrlp_clear_cache_on_exit = 1
-  "   let g:ctrlp_max_height = 40
-  "   let g:ctrlp_show_hidden = 1
-  "   let g:ctrlp_follow_symlinks = 1
-  "   let g:ctrlp_max_files = 20000
-  "   let g:ctrlp_cache_dir = GetCacheDir('ctrlp')
-  "   let g:ctrlp_reuse_window = 'startify'
-  "   let g:ctrlp_extensions = ['funky']
-  "   let g:ctrlp_custom_ignore = {
-  "       \ 'dir': '\v[\/]\.(git|hg|svn|idea)$',
-  "       \ 'file': '\v\.DS_Store$'
-  "       \ }
-
-  "   if executable('ag')
-  "     let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
-  "   endif
-
-  "   nmap \ [ctrlp]
-  "   nnoremap [ctrlp] <Nop>
-
-  "   nnoremap [ctrlp]t :CtrlPBufTag<CR>
-  "   nnoremap [ctrlp]T :CtrlPTag<CR>
-  "   nnoremap [ctrlp]l :CtrlPLine<CR>
-  "   nnoremap [ctrlp]o :CtrlPFunky<CR>
-  "   nnoremap [ctrlp]b :CtrlPBuffer<CR>
-  "   let g:ctrlp_prompt_mappings = {
-  "   \ 'AcceptSelection("e")': ['<c-t>'],
-  "   \ 'AcceptSelection("t")': ['<cr>', '<2-LeftMouse>'],
-  "   \ }
-  " " }}}
+  call dein#add('kshenoy/vim-signature') " {{{
+    let g:SignatureMarkerTextHL = 'Typedef'
+    let g:SignatureMap = {
+      \ 'Leader'             :  "m",
+      \ 'PlaceNextMark'      :  "m,",
+      \ 'ToggleMarkAtLine'   :  "m.",
+      \ 'PurgeMarksAtLine'   :  "m-",
+      \ 'DeleteMark'         :  "dm",
+      \ 'PurgeMarks'         :  "m<Space>",
+      \ 'PurgeMarkers'       :  "m<BS>",
+      \ 'GotoNextLineAlpha'  :  "",
+      \ 'GotoPrevLineAlpha'  :  "",
+      \ 'GotoNextSpotAlpha'  :  "",
+      \ 'GotoPrevSpotAlpha'  :  "",
+      \ 'GotoNextLineByPos'  :  "]'",
+      \ 'GotoPrevLineByPos'  :  "['",
+      \ 'GotoNextSpotByPos'  :  "]`",
+      \ 'GotoPrevSpotByPos'  :  "[`",
+      \ 'GotoNextMarker'     :  "[+",
+      \ 'GotoPrevMarker'     :  "[-",
+      \ 'GotoNextMarkerAny'  :  "]=",
+      \ 'GotoPrevMarkerAny'  :  "[=",
+      \ 'ListLocalMarks'     :  "m/",
+      \ 'ListLocalMarkers'   :  "m?"
+      \ }
+  " }}}
   
   " ./install --all so the interactive script doesn't block
   " you can check the other command line options  in the install file
@@ -864,27 +792,21 @@ set shell=/bin/bash
         \ '--preview "highlight -O ansi -l {} 2> /dev/null ;or cat {} 2> /dev/null | head -'.&lines.'"'
   " "}}}
 
+  call dein#add('sunaku/vim-shortcut', { 'depends': 'fzf.vim' }) " {{{
+
+  " }}}
+
   call dein#add('majutsushi/tagbar', {'on_cmd': 'TagbarToggle'}) " {{{
     let g:tagbar_left = 1
     let g:tagbar_width = 30
     let g:tagbar_autoclose = 0
-  " }}}
-  " call dein#add('jeetsukumaran/vim-buffergator') " {{{
-  "   let g:buffergator_suppress_keymaps = 1
-  "   let g:buffergator_suppress_mru_switch_into_splits_keymaps = 1
-  "   let g:buffergator_viewport_split_policy = "B"
-  "   let g:buffergator_split_size = 10
-  "   let g:buffergator_sort_regime = "mru"
-  "   let g:buffergator_mru_cycle_loop = 0
-  " "}}}
-  " }}}
-  "call dein#add('vim-ctrlspace/vim-ctrlspace') " {{{
-  "  if executable("ag")
-  "      let g:CtrlSpaceGlobCommand = 'ag -l --nocolor -g ""'
-  "  endif
-  "  let g:CtrlSpaceDefaultMappingKey = "<Leader>c"
-    "let g:CtrlSpaceUseMouseAndArrowsInTerm = 1
-  "  let g:CtrlSpaceUseTabline = 0
+
+    let g:tagbar_status_func = 'TagbarStatusFunc'
+
+    function! TagbarStatusFunc(current, sort, fname, ...) abort
+      let g:lightline.fname = a:fname
+      return lightline#statusline(0)
+    endfunction
   " }}}
 " }}}
 
@@ -909,28 +831,15 @@ set shell=/bin/bash
   call dein#add('tpope/vim-fugitive') " {{{
      autocmd BufReadPost fugitive://* set bufhidden=delete
   " }}}
-  "call dein#add('gregsexton/gitv', {'depends': 'vim-fugitive', 'on_cmd': 'Gitv'}) " {{{
-  " }}}
   call dein#add('airblade/vim-gitgutter')
 " }}}
 
-  call dein#add('Shougo/denite.nvim') " {{{
-    set rtp+=~/.config/nvim/plugins/repos/github.com/Shougo/denite.nvim/
-    call denite#custom#map('insert', '<Down>', '<denite:move_to_next_line>', 'noremap')
-    call denite#custom#map('insert', '<Up>', '<denite:move_to_previous_line>', 'noremap')
-    let s:menus = {}
-    call denite#custom#var('menu', 'menus', s:menus)
-  " }}}
-" }}}
-
-" Building {{{
-  " call dein#add('neomake/neomake')
-" }}}
 call dein#end()
 if dein#check_install()
   call dein#install()
 endif
 
+runtime plugin/shortcut.vim
 
 " Autocommands {{{
  augroup nvim_edit
@@ -976,79 +885,12 @@ endif
     autocmd FileType php autocmd BufWritePre <buffer> call StripTrailingWhitespace()
     autocmd FileType coffee autocmd BufWritePre <buffer> call StripTrailingWhitespace()
     autocmd FileType vim setlocal foldmethod=indent keywordprg=:help
-
-    " vim-jsbeautify
-    if dein#is_sourced('vim-jsbeautify')
-      autocmd FileType javascript nnoremap <silent> <SID>js-beautify :call JsBeautify()<CR>
-      autocmd FileType javascript nmap <LocalLeader>j <SID>js-beautify
-    endif
   augroup end
 " }}}
 
-" functions {{{
+" useful functions {{{
 
-  " " toggle quickfix list and location list
-  " function! GetBufferList()
-  "   redir =>buflist
-  "   silent! ls
-  "   redir END
-  "   return buflist
-  " endfunction
-
-  " function! s:BufInfo()
-  "   echo "\n----- buffer info -----"
-  "   echo "bufnr('%')=" . bufnr('%') . " // current buffer number"
-  "   echo "bufnr('$')=" . bufnr('$') . " // tail buffer number"
-  "   echo "bufnr('#')=" . bufnr('#') . " // previous buffer number"
-  "   for i in range(1, bufnr('$'))
-  "     echo "bufexists(" . i . ")=" . bufexists(i)
-  "     echon " buflisted(" . i . ")=" . buflisted(i)
-  "     echon " bufloaded(" . i . ")=" . bufloaded(i)
-  "     echon " bufname(" . i . ")=" . bufname(i)
-  "   endfor
-  "   echo "// bufexists(n)= buffer n exists"
-  "   echo "// buflisted(n)= buffer n listed"
-  "   echo "// bufloaded(n)= buffer n loaded"
-  "   echo "// bufname(n)= buffer name"
-
-  "   echo "\n----- window info -----"
-  "   echo "winnr()="    . winnr()    . " // current window number"
-  "   echo "winnr('$')=" . winnr('$') . " // tail window number"
-  "   echo "winnr('#')=" . winnr('#') . " // previous window number"
-  "   for i in range(1, winnr('$'))
-  "     echo "winbufnr(" . i . ")=" . winbufnr(i) . " // window " . i . "'s buffer number"
-  "   endfor
-
-  "   echo "\n----- tab info -----"
-  "   echo "tabpagenr()="    . tabpagenr()    . ' // current tab number'
-  "   echo "tabpagenr('$')=" . tabpagenr('$') . ' // tail tab number'
-  "   for i in range(1, tabpagenr('$'))
-  "     echo 'tabpagebuflist(' . i . ')='
-  "     echon tabpagebuflist(i)
-  "     echon " // tab " . i . "'s buffer list"
-  "   endfor
-  "   for i in range(1, tabpagenr('$'))
-  "     echo "tabpagewinnr(" . i . ")=" . tabpagewinnr(i)
-  "     echon " tabpagewinnr(" . i . ", '$')=" . tabpagewinnr(i, '$')
-  "     echon " tabpagewinnr(" . i . ", '#')=" . tabpagewinnr(i, '#')
-  "   endfor
-  "   echo "// tabpagewinnr(n)     = tab n's current window number"
-  "   echo "// tabpagewinnr(n, '$')= tab n's tail window number"
-  "   echo "// tabpagewinnr(n, '#')= tab n's previous window number"
-
-  " endfunction
-"}}}
-
-" other useful functions {{{
-
-  " function! <SID>EvalVimscript(begin, end) "{{{
-  "   let lines = getline(a:begin, a:end)
-  "   for line in lines
-  "     execute line
-  "   endfor
-  " endfunction "}}}
-
-  function! <SID>CloseWindowOrKillBuffer() "{{{
+  function! <SID>CloseWindowOrKillBuffer() " {{{
     " never bdelete a nerd tree
     if matchstr(expand("%"), 'NERD') ==# 'NERD'
       wincmd c
@@ -1143,33 +985,38 @@ endif
     return join(s:lines, ' ')
   endfunction " }}}
 
+
+  " Relative numbering
+  function! NumberToggle() " {{{
+    if(&relativenumber == 1)
+        set nornu
+        set number
+    else
+        set rnu
+    endif
+  endfunction " }}}
+
 " }}}
 
 " mappings {{{
+  " Map shortcuts
+  Shortcut show shortcut menu and run chosen shortcut
+      \ noremap <silent> <Leader><Leader> :Shortcuts<Return>
+
   " maximize or restore current window in split structure
-  noremap <C-w>O :call <SID>MaximizeToggle()<CR>
+  Shortcut maximize or restore current window in split structure 
+      \ noremap <C-w>O :call <SID>MaximizeToggle()<CR>
   " noremap <C-w><C-o> :call <SID>MaximizeToggle()<CR>
 
   " remap arrow keys
-  nmap h :bprev<CR>
-  nmap <S-Left> :bprev<CR>
+  "nmap h :bprev<CR>
+  Shortcut switch to previous buffer 
+      \ nmap <S-Left> :bprev<CR>
   " :call LightLineBufferline()<CR>:call lightline#update()<CR>
-  nmap l :bnext<CR>
-  nmap <S-Right> :bnext<CR>
+  "nmap l :bnext<CR>
+  Shortcut switch to next buffer 
+      \ nmap <S-Right> :bnext<CR>
   " :call LightLineBufferline()<CR>:call lightline#update()<CR>
-  "nnoremap <Up> :tabnext<CR>
-  "nnoremap <Down> :tabprev<CR>
-
-  " smash escape
-  " inoremap jk <Esc>
-  " inoremap kj <Esc>
-
-  " change cursor position in insert mode
-  " use S-BS instead of BS to delete in insert mode in some terminal
-  " inoremap <C-h> <Left>
-  " inoremap <C-l> <Right>
-
-  " inoremap <C-u> <C-g>u<C-u>
 
   " sane regex {{{
     nnoremap / /\v
@@ -1192,11 +1039,6 @@ endif
     "nnoremap zM zM:echo &foldlevel<CR>
   " }}}
 
-  " screen line scroll {{{
-    "nnoremap <silent> j gj
-    "nnoremap <silent> k gk
-  " }}}
-
   " auto center {{{
     "nnoremap <silent> n nzz
     "nnoremap <silent> N Nzz
@@ -1213,16 +1055,6 @@ endif
     "vnoremap > >gv
   "}}}
 
-  " shortcuts for windows {{{
-    " <http://stackoverflow.com/questions/9092982/mapping-c-j-to-something-in-vim>
-    "let g:C_Ctrl_j = 'off'
-    "let g:BASH_Ctrl_j = 'off'
-    "nnoremap <C-h> <C-w>h
-    "nnoremap <C-j> <C-w>j
-    "nnoremap <C-k> <C-w>k
-    "nnoremap <C-l> <C-w>l
-  "}}}
-
   " make Y consistent with C and D. See :help Y.
   "nnoremap Y y$
 
@@ -1230,252 +1062,101 @@ endif
   "nnoremap <C-c> <C-c>:echo<CR>
 
   " window killer
-  nnoremap <silent> Q :call <SID>CloseWindowOrKillBuffer()<CR>
-
-  " vim menu
-  let s:menus.vim = {
-		\ 'description': 'Edit your nvim configuration'
-		\ }
-  let config_file_path = s:nvim_dir . g:path_separator . 'init.vim'
-	let s:menus.vim.file_candidates = [
-		\ [config_file_path, config_file_path],
-		\ ]
-
-  " Global denite menu
-  noremap <silent> <SID>menu-global :Denite menu<CR>
-  nmap <Leader>m <SID>menu-global
-
-  "nnoremap <silent> <SID>key-mappings :<C-u>Unite -toggle -auto-resize -buffer-name=mappings mapping<CR>
-  "nmap <Leader>? <SID>key-mappings
-
-  "nnoremap <silent> <SID>last-buffer :buffer#<CR>
-  "nmap <Leader><Tab> <SID>last-buffer
+    Shortcut close window or kill buffer 
+        \ nnoremap <silent> Q :call <SID>CloseWindowOrKillBuffer()<CR>
 
   " applications {{{
-
-    "let g:lmap.a = { 'name' : '+applications' }
-
-    nnoremap <silent> <SID>undotree-toggle :UndotreeToggle<CR>
-    nmap <Leader>au <SID>undotree-toggle
-
-    let s:menus.applications = {
-    \ 'description' : 'Applications',
-    \}
-    let s:menus.applications.command_candidates = [
-    \['▷ Undo Tree            (UndoTree)                                ⌘ <Leader>au', 'UndotreeToggle'],
-    \] " Append ' --' after log to get commit info commit buffers
-    nnoremap <silent> <SID>files-menu :Denite menu:files<CR>
-    "nnoremap <SID>gdb :ConqueGdbVSplit<CR>
-    "nmap <Leader>ag <SID>gdb
-
-    "let g:lmap.a.s = { 'name' : '+shell' }
-
-    " vimshell
-    "nnoremap <SID>vimshell :VimShell -split<CR>
-    "nmap <Leader>asv <SID>vimshell
-    "nnoremap <SID>vimshell-node :VimShellInteractive node<CR>
-    "nmap <Leader>asn <SID>vimshell-node
-    "nnoremap <SID>vimshell-lua :VimShellInteractive lua<CR>
-    "nmap <Leader>asl <SID>vimshell-lua
-    "nnoremap <SID>vimshell-irb :VimShellInteractive irb<CR>
-    "nmap <Leader>asi <SID>vimshell-irb
-    "nnoremap <SID>vimshell-asp :VimShellInteractive python<CR>
-    "nmap <Leader>asp <SID>vimshell-asp
-
-  "}}}
+    Shortcut (undotree) toggle undotree 
+        \ nnoremap <silent>  <Leader>au :UndotreeToggle<CR>
+  " }}}
 
   " buffers {{{
+    Shortcut (fzf) open buffer
+        \ nnoremap <silent> <Leader>bb :Buffers<CR>
 
-    "let g:lmap.b = { 'name' : '+buffers' }
-
-    "nnoremap <silent> <SID>unite-quick-match-buffer :<C-u>Unite -toggle -auto-resize -quick-match buffer<CR>
-    "nmap <Leader>bm <SID>unite-quick-match-buffer
-
-    nnoremap <silent> <SID>buffers :Buffers<CR>
-    nmap <Leader>bb <SID>buffers
-
-
-    "let g:lmap.b.k = { 'name' : '+buffer-kill' }
-
-    "let g:lmap.b.k['!'] = { 'name' : '+!' }
-    "nmap <silent> <SID>buffer-kill-back <Plug>BufKillBack
-    "nmap <Leader>bkb <SID>buffer-kill-back
-    "nmap <silent> <SID>buffer-kill-forward <Plug>BufKillForward
-    "nmap <Leader>bkf <SID>buffer-kill-forward
-    "nmap <silent> <SID>buffer-kill-bun <Plug>BufKillBun
-    "nmap <Leader>bku <SID>buffer-kill-bun
-    "nmap <silent> <SID>buffer-kill-bangbun <Plug>BufKillBangBun
-    "nmap <Leader>bk!u <SID>buffer-kill-bangbun
-    "nmap <silent> <SID>buffer-kill-bd <Plug>BufKillBd
-    "nmap <Leader>bkd <SID>buffer-kill-bd
-    "nmap <silent> <SID>buffer-kill-bangbd <Plug>BufKillBangBd
-    "nmap <Leader>bk!d <SID>buffer-kill-bangbd
-    "nmap <silent> <SID>buffer-kill-bw <Plug>BufKillBw
-    "nmap <Leader>bkw <SID>buffer-kill-bw
-    "nmap <silent> <SID>buffer-kill-bangbw <Plug>BufKillBangBw
-    "nmap <Leader>bk!w <SID>buffer-kill-bangbw
-    "nmap <silent> <SID>buffer-kill-undo <Plug>BufKillUndo
-    "nmap <Leader>bko <SID>buffer-kill-undo
-    "nmap <silent> <SID>buffer-kill-alt <Plug>BufKillAlt
-    "nmap <Leader>bka <SID>buffer-kill-alt
-
-    "if dein#is_sourced('vim-buffergator') " {{{
-
-      " buffergator
-      " nnoremap <silent> <SID>buffer-preview :BuffergatorOpen<CR>
-      " nmap <Leader>bp <SID>buffer-preview
-      " nnoremap <silent> <M-b> :BuffergatorMruCyclePrev<CR>
-      " nnoremap <silent> <M-S-b> :BuffergatorMruCycleNext<CR>
-      " nnoremap <silent> [b :BuffergatorMruCyclePrev<CR>
-      " nnoremap <silent> ]b :BuffergatorMruCycleNext<CR>
-
-    "endif "}}}
-
-  "}}}
-
-  " debug {{{
-
-    " let g:lmap.d = { 'name' : '+debug' }
-
-    " nnoremap <silent> <SID>debug-start :exe ":profile start profile.log"<CR>:exe ":profile func *"<CR>:exe ":profile file *"<CR>
-    " nmap <Leader>ds <SID>debug-start
-    " nnoremap <silent> <SID>profile-pause :exe ":profile pause"<CR>
-    " nmap <Leader>dp <SID>profile-pause
-    " nnoremap <silent> <SID>profile-continue :exe ":profile continue"<CR>
-    " nmap <Leader>dc <SID>profile-continue
-    " nnoremap <silent> <SID>profile-quit :exe ":profile pause"<CR>:noautocmd qall!<CR>
-    " nmap <Leader>dq <SID>profile-quit
-
-  "}}}
+  " }}}
 
   " files {{{
+    Shortcut (fzf) open file in/under working directory 
+      \ nnoremap <silent> <Leader>ff :Files<CR>
 
-    "let g:lmap.f = { 'name' : '+files' }
-    nnoremap <silent> <SID>files :Files<CR>
-    nmap <Leader>ff <SID>files
-    nnoremap <silent> <SID>history :History<CR>
-    nmap <Leader>fr <SID>history
-    nnoremap <silent> <SID>nerdtree-toggle :NERDTreeToggle<CR>
-    nmap <Leader>ft <SID>nerdtree-toggle
-    nnoremap <silent> <SID>nerdtree-find :NERDTreeFind<CR>
-    nmap <Leader>fT <SID>nerdtree-find
-    nnoremap <silent> <SID>git-files :GFiles<CR>
-    nmap <Leader>fg <SID>git-files
-    nnoremap <silent> <SID>git-modified :GFiles?<CR>
-    nmap <Leader>fG <SID>git-modified
+    Shortcut (fzf) open file relative to current file
+        \ nnoremap <silent> <Leader>fF :execute 'Files' expand('%:h')<CR>
 
-    let s:menus.files = {
-    \ 'description' : 'File handling',
-    \}
-    let s:menus.files.command_candidates = [
-    \['▷ Files              (FZF)                                ⌘ <Leader>ff', 'Files'],
-    \['▷ History            (FZF)                                ⌘ <Leader>fr', 'History'],
-    \['▷ NerdTree           (NerdTree)                           ⌘ <Leader>ft', 'NerdTreeToggle'],
-    \['▷ NerdTree-Find      (NerdTree)                           ⌘ <Leader>fT', 'NERDTreeFind'],
-    \['▷ Git-Files          (FZF)                                ⌘ <Leader>fg', 'GFiles'],
-    \['▷ Modified-Files     (FZF)                                ⌘ <Leader>fG', 'GFiles?'],
-    \] " Append ' --' after log to get commit info commit buffers
-    nnoremap <silent> <SID>files-menu :Denite menu:files<CR>
-    nmap <Leader>F <SID>files-menu
-    " let g:lmap.f.v = { 'name' : '+vim' }
+    Shortcut (fzf) open file from history
+        \ nnoremap <silent> <Leader>fr :History<CR>
 
-    " let g:lmap.f.a = ['A', 'alternate-file']
-    " let g:lmap.f.s = ['w', 'save-buffer']
-    " let g:lmap.f.v.d = ['e ~/.unvimrc', 'edit-dotfile']
-    " let g:lmap.f.v.i = ['e $MYVIMRC', 'edit-init-file']
-    "let g:lmap.f.v.R = ['source $MYVIMRC', 'reload-configuration']
-  "}}}
+    Shortcut (nerdtree) open/close nerdtree in working directory
+        \ nnoremap <silent> <Leader>ft :NERDTreeToggle<CR>
+
+    Shortcut (nerdtree) open nerdtree in current buffer's directory
+        \ nnoremap <silent> <Leader>fT :NERDTreeFind<CR>
+
+    Shortcut (fzf) open file in git repository
+        \ nnoremap <silent> <Leader>fg :GFiles<CR>
+
+    Shortcut (fzf) open file in git status
+        \ nnoremap <silent> <Leader>fG :GFiles?<CR>
+
+  " }}}
 
   " " git/versions-control {{{
 
-  "   let g:lmap.g = { 'name' : '+git/versions-control' }
+    Shortcut (fugitive) git blame 
+        \ nnoremap <silent> <Leader>gb :Gblame<CR>
 
-    nnoremap <silent> <SID>git-blame :Gblame<CR>
-    nmap <Leader>gb <SID>git-blame
-    nnoremap <silent> <SID>git-commit :Gcommit<CR>
-    nmap <Leader>gc <SID>git-commit
-    nnoremap <silent> <SID>git-diff :Gvdiff<CR>
-    nmap <Leader>gd <SID>git-diff
-    nnoremap <silent> <SID>git-log :Glog<CR>
-    nmap <Leader>gl <SID>git-log
-    nnoremap <silent> <SID>git-push :Git push<CR>
-    nmap <Leader>gp <SID>git-push
-    nnoremap <silent> <SID>git-remove :Gremove<CR>
-    nmap <Leader>gr <SID>git-remove
-    nnoremap <silent> <SID>git-status :Gstatus<CR>
-    nmap <Leader>gs <SID>git-status
-    nnoremap <silent> <SID>git-commits :Commits<CR>
-    nmap <Leader>gv <SID>git-commits
-    nnoremap <silent> <SID>git-commits-buffer :BCommits<CR>
-    nmap <Leader>gV <SID>git-commits-buffer
-    "nnoremap <silent> <SID>git-v! :Gitv!<CR>
-    "nmap <Leader>gV <SID>git-v!
-    nnoremap <silent> <SID>git-write :Gwrite<CR>
-    nmap <Leader>ga <SID>git-write
+    Shortcut (fugitive) git commit 
+        \ nnoremap <silent> <Leader>gc :Gcommit<CR>
 
-    let s:menus.git = {
-		\ 'description': 'Git Commands'
-		\ }
-    "\[' git status', 'Gstatus'],
-    let s:menus.git.command_candidates = [
-    \['▷ Git Diff                (Fugitive)                      ⌘ <Leader>gd', 'Gvdiff'],
-    \['▷ Git Commit              (Fugitive)                      ⌘ <Leader>gc', 'Gcommit'],
-    \['▷ Git Stage/Add           (Fugitive)                      ⌘ <Leader>ga', 'Gwrite'],
-    \['▷ Git Checkout            (Fugitive)                                   ', 'Gread'],
-    \['▷ Git Remove              (Fugitive)                      ⌘ <Leader>gr', 'Gremove'], 
-    \['▷ Git Cd                  (Fugitive)                                   ', 'Gcd'],
-    \['▷ Git Push                (Fugitive)                      ⌘ <Leader>gp', 'exe "Git! push " input("remote/branch: ")'],
-    \['▷ Git Pull                (Fugitive)                                   ', 'exe "Git! pull " input("remote/branch: ")'],
-    \['▷ Git Pull Rebase         (Fugitive)                                   ', 'exe "Git! pull --rebase " input("branch: ")'],
-    \['▷ Git Checkout Branch     (Fugitive)                                   ', 'exe "Git! checkout " input("branch: ")'],
-    \['▷ Git Fetch               (Fugitive)                                   ', 'Gfetch'],
-    \['▷ Git Merge               (Fugitive)                                   ', 'Gmerge'],
-    \['▷ Git Browse              (Fugitive)                                   ', 'Gbrowse'],
-    \['▷ Git Head                (Fugitive)                                   ', 'Gedit HEAD^'],
-    \['▷ Git Parent              (Fugitive)                                   ', 'edit %:h'],
-    \['▷ Git Log Commit Buffers  (Fugitive)                                   ', 'Glog --'],
-    \['▷ Git Log Current File    (Fugitive)                                   ', 'Glog -- %'],
-    \['▷ Git Log Last n Commits  (Fugitive)                                   ', 'exe "Glog -" input("num: ")'],
-    \['▷ Git Log First n Commits (Fugitive)                                   ', 'exe "Glog --reverse -" input("num: ")'],
-    \['▷ Git Log Until Date      (Fugitive)                                   ', 'exe "Glog --until=" input("day: ")'],
-    \['▷ Git Log Grep Commits    (Fugitive)                                   ', 'exe "Glog --grep= " input("string: ")'],
-    \['▷ Git Log Pickaxe         (Fugitive)                                   ', 'exe "Glog -S" input("string: ")'],
-    \['▷ Git Index               (Fugitive)                                   ', 'exe "Gedit " input("branchname\:filename: ")'],
-    \['▷ Git Mv                  (Fugitive)                                   ', 'exe "Gmove " input("destination: ")'],
-    \['▷ Git Grep                (Fugitive)                                   ', 'exe "Ggrep " input("string: ")'],
-    \['▷ Git Prompt              (Fugitive)                                   ', 'exe "Git! " input("command: ")'],
-    \] " Append ' --' after log to get commit info commit buffers
+    Shortcut (fugitive) git diff 
+        \ nnoremap <silent> <Leader>gd :Gvdiff<CR>
 
-    nnoremap <silent> <SID>git-menu :Denite menu:git<CR>
-    nmap <Leader>G <SID>git-menu
+    Shortcut (fugitive) git log 
+        \ nnoremap <silent> <Leader>gl :Glog<CR>
+
+    Shortcut (fugitive) git push 
+        \ nnoremap <silent> <Leader>gp :Git push<CR>
+
+    Shortcut (fugitive) git remove 
+        \ nnoremap <silent> <Leader>gr :Gremove<CR>
+
+    Shortcut (fugitive) git status 
+        \ nnoremap <silent> <Leader>gs :Gstatus<CR>
+
+    Shortcut (fzf) git commit history 
+        \ nnoremap <silent> <Leader>gv :Commits<CR>
+
+    Shortcut (fzf) git commit history of current buffer 
+        \ nnoremap <silent> <Leader>gV :BCommits<CR>
+
+    Shortcut (fugitive) git commit/write 
+        \ nnoremap <silent> <Leader>ga :Gwrite<CR>
 
   " search/symbol {{{
 
-    " let g:lmap.s = { 'name' : '+search/symbol' }
-
     " search current word in current directory
-    nnoremap <SID>grep-word-in-directory :call fzf#vim#lines(expand('<cword>'))<CR>
-    nmap <Leader>sd <SID>grep-word-in-directory
+    Shortcut (fzf) search word under cursor in current directory 
+        \ nnoremap <silent> <Leader>sd :call fzf#vim#lines(expand('<cword>'))<CR>
 
     " search current word in current file
-    nnoremap <SID>grep-word-in-file :call fzf#vim#buffer_lines(expand('<cword>'))<CR>
-    nmap <Leader>sf <SID>grep-word-in-file
+    Shortcut (fzf) search word under cursor in current file 
+        \ nnoremap <silent> <Leader>sf :call fzf#vim#buffer_lines(expand('<cword>'))<CR>
 
     " search the selected text in current directory
-    vnoremap <SID>grep-in-directory :call fzf#vim#lines(<SID>GetVisualSelection())<CR>
-    vmap <Leader>sd <SID>grep-in-directory
+    Shortcut (fzf) search selected text in current directory 
+        \ vnoremap <silent> <Leader>sd :call fzf#vim#lines(<SID>GetVisualSelection())<CR>
 
     " search the selected text in current file
-    vnoremap <SID>grep-in-file :call fzf#vim#buffer_lines(<SID>GetVisualSelection())<CR>
-    vmap <Leader>sf <SID>grep-in-file
+    Shortcut (fzf) search selected text in current file 
+        \ vnoremap <silent> <Leader>sf :call fzf#vim#buffer_lines(<SID>GetVisualSelection())<CR>
 
-    " let g:lmap.s.g = { 'name' : '+grep' }
+    Shortcut (fzf) go to line in any file in directory
+        \ nnoremap <silent> <Space>'F :Ag<Return>
+
 
     " " search specific content in current directory
     " nnoremap <SID>grep-in-directory :vimgrep /\<<C-r>=expand("<cword>")<CR>\>/j **/*<Left><Left><Left><Left><Left><Left><Left><Left><Left>
     " nmap <Leader>sgd <SID>grep-in-directory
-
-    " let g:lmap.s.g.e = ['GrepOptions', 'easygrep-options']
 
     " " search specific content in current file
     " nnoremap <SID>grep-in-file :vimgrep /\<<C-r>=expand("<cword>")<CR>\>/j <C-r>%
@@ -1485,147 +1166,74 @@ endif
     " nnoremap <SID>grep-last :execute 'vimgrep /'.@/.'/g %'<CR>:copen<CR>
     " nmap <Leader>sl <SID>grep-last
 
-    " " replace specific content
-    nnoremap <SID>replace-in-file :%s/\<<C-r>=expand("<cword>")<CR>\>/<C-r>=expand("<cword>")<CR>/g<Left><Left>
-    nmap <Leader>sr <SID>replace-in-file
+    "  replace specific content
+    Shortcut search and replace word under cursor 
+        \ nnoremap <Leader>sr :%s/\<<C-r>=expand("<cword>")<CR>\>/<C-r>=expand("<cword>")<CR>/g<Left><Left>
 
     " replace the selected text
-    vnoremap <SID>replace-in-file :call <SID>VisualSelection('replace')<CR>
-    vmap <Leader>sr <SID>replace-in-file
+    Shortcut search and replace selected text 
+        \ vnoremap <silent> <Leader>sr :call <SID>VisualSelection('replace')<CR>
 
-    nmap <Leader>sR :%s///g<Left><Left><Left>
-    " if dein#is_sourced('denite.nvim')
-    "   nnoremap <silent> <SID>denite-cursorword :<C-u>DeniteCursorWord -no-quit -auto-resize -buffer-name=search grep:.<CR>
-    "   nmap <Leader>ss <SID>denite-cursorword
-    " "elseif dein#is_sourced('unite.vim')
-    " ""  nnoremap <silent> <SID>unite-cursorword :<C-u>UniteWithCursorWord -no-quit -toggle -auto-resize -buffer-name=search grep:.<CR>
-    " ""  nmap <Leader>ss <SID>unite-cursorword
-    " endif
-
-    " let g:lmap.s.t = { 'name' : '+tags' }
+    Shortcut search and replace 
+        \ nnoremap <Leader>sR :%s///g<Left><Left><Left>
 
     if dein#is_sourced('asyncrun.vim')
-       nnoremap <SID>create-tags :AsyncRun! gtags;cscope -Rbq;ctags -R<CR>
-       nnoremap <SID>remove-tags :AsyncRun! rm tags;rm cscope.in.out;rm cscope.out;rm cscope.po.out;rm GTAGS;rm GRTAGS;rm GPATH<CR>
-       nmap <Leader>sta <SID>create-tags
-       nmap <Leader>stv <SID>remove-tags
+      Shortcut create ctags 
+          \ nnoremap <silent> <Leader>sta :AsyncRun! gtags;cscope -Rbq;ctags -R<CR>
+      Shortcut remove ctags 
+          \ nnoremap <silent> <Leader>stv :AsyncRun! rm tags;rm cscope.in.out;rm cscope.out;rm cscope.po.out;rm GTAGS;rm GRTAGS;rm GPATH<CR>
     endif
 
-    " " cscope
-    " if has("cscope")
-    "   "if g:navim_settings.cscopeprg ==# 'gtags-cscope'  " global
+    " cscope
+    if has("cscope")
+        " go to definition
+        "vnoremap <SID>gtags-definition <Esc>:execute 'Gtags ' . <SID>GetVisualSelection()
+        Shortcut go to definition 
+            \ nnoremap <Leader>std :Gtags -d <C-r>=expand("<cword>")<CR>
 
-    "     " go to definition
-    "     nnoremap <SID>gtags-definition :Gtags -d <C-r>=expand("<cword>")<CR>
-    "     "vnoremap <SID>gtags-definition <Esc>:execute 'Gtags ' . <SID>GetVisualSelection()
-    "     nmap <Leader>std <SID>gtags-definition
+        " locate strings
+        "nnoremap <SID>gtags-strings :execute 'Gtags -g ' . expand('<cword>')
+        "vnoremap <SID>gtags-strings <Esc>:execute 'Gtags -g ' . <SID>GetVisualSelection()
+        Shortcut locate word under cursor
+            \ noremap <Leader>ste :Gtags -g <C-r>=expand("<cword>")<CR>
 
-    "     " locate strings
-    "     nnoremap [cscope]e :Gtags -g <C-r>=expand("<cword>")<CR>
-    "     "nnoremap <SID>gtags-strings :execute 'Gtags -g ' . expand('<cword>')
-    "     "vnoremap <SID>gtags-strings <Esc>:execute 'Gtags -g ' . <SID>GetVisualSelection()
-    "     nmap <Leader>ste <SID>gtags-strings
+        " get a list of tags in specified files
+        "vnoremap <SID>gtags-files <Esc>:execute 'Gtags -f ' . <SID>GetVisualSelection()
+        Shortcut get list of tags in specified files 
+            \ nnoremap <Leader>stf :Gtags -f %<CR>
 
-    "     " get a list of tags in specified files
-    "     nnoremap <SID>gtags-files :Gtags -f %<CR>
-    "     "vnoremap <SID>gtags-files <Esc>:execute 'Gtags -f ' . <SID>GetVisualSelection()
-    "     nmap <Leader>stf <SID>gtags-files
+        " go to definition or reference
+        Shortcut go to definition of reference 
+            \ nnoremap <Leader>stg :GtagsCursor<CR>
 
-    "     " go to definition or reference
-    "     nnoremap <SID>gtags-cursor :GtagsCursor<CR>
-    "     nmap <Leader>stg <SID>gtags-cursor
+        " find reference
+        "vnoremap <SID>gtags-reference <Esc>:execute 'Gtags -r ' . <SID>GetVisualSelection()
+        Shortcut find reference 
+            \ nnoremap <Leader>str :Gtags -r <C-r>=expand("<cword>")<CR>
 
-    "     " find reference
-    "     nnoremap <SID>gtags-reference :Gtags -r <C-r>=expand("<cword>")<CR>
-    "     "vnoremap <SID>gtags-reference <Esc>:execute 'Gtags -r ' . <SID>GetVisualSelection()
-    "     nmap <Leader>str <SID>gtags-reference
-
-    "     " locate symbols which are not defined in `GTAGS`
-    "     nnoremap <SID>gtags-symbols :Gtags -s <C-r>=expand("<cword>")<CR>
-    "     "vnoremap <SID>gtags-symbols <Esc>:execute 'Gtags -s ' . <SID>GetVisualSelection()
-    "     nmap <Leader>sts <SID>gtags-symbols
-
-    "   " elseif g:navim_settings.cscopeprg ==# 'cscope'  " cscope
-
-    "   "   " calls: find all calls to the function name under cursor
-    "   "   nnoremap <SID>cscope-calls :cscope find c <C-r>=expand("<cword>")<CR>
-    "   "   "vnoremap <SID>cscope-calls <Esc>:execute 'cscope find c ' . <SID>GetVisualSelection()
-    "   "   nmap <Leader>stc <SID>cscope-calls
-
-    "   "   " called: find functions that function under cursor calls
-    "   "   nnoremap <SID>cscope-called :cscope find d <C-r>=expand("<cword>")<CR>
-    "   "   "vnoremap <SID>cscope-called <Esc>:execute 'cscope find d ' . <SID>GetVisualSelection()
-    "   "   nmap <Leader>std <SID>cscope-called
-
-    "   "   " egrep:  egrep search for the word under cursor
-    "   "   nnoremap <SID>cscope-egrep :cscope find e <C-r>=expand("<cword>")<CR>
-    "   "   "vnoremap <SID>cscope-egrep <Esc>:execute 'cscope find e ' . <SID>GetVisualSelection()
-    "   "   nmap <Leader>ste <SID>cscope-egrep
-
-    "   "   " file: open the filename under cursor
-    "   "   nnoremap <SID>cscope-file :cscope find f <C-r>=expand("<cword>")<CR>
-    "   "   "vnoremap <SID>cscope-file <Esc>:execute 'cscope find f ' . <SID>GetVisualSelection()
-    "   "   nmap <Leader>stf <SID>cscope-file
-
-    "   "   " global: find global definition(s) of the token under cursor
-    "   "   nnoremap <SID>cscope-global :cscope find g <C-r>=expand("<cword>")<CR>
-    "   "   "vnoremap <SID>cscope-global <Esc>:execute 'cscope find g ' . <SID>GetVisualSelection()
-    "   "   nmap <Leader>stg <SID>cscope-global
-
-    "   "   " symbol: find all references to the token under cursor
-    "   "   nnoremap <SID>cscope-symbol :cscope find s <C-r>=expand("<cword>")<CR>
-    "   "   "vnoremap <SID>cscope-symbol <Esc>:execute 'cscope find s ' . <SID>GetVisualSelection()
-    "   "   nmap <Leader>sts <SID>cscope-symbol
-
-    "   "   " text: find all instances of the text under cursor
-    "   "   nnoremap <SID>cscope-text :cscope find t <C-r>=expand("<cword>")<CR>
-    "   "   "vnoremap <SID>cscope-text <Esc>:execute 'cscope find t ' . <SID>GetVisualSelection()
-    "   "   nmap <Leader>stt <SID>cscope-text
-
-    " includes: find files that include the filename under cursor
-    "nnoremap <SID>cscope-includes :cscope find i <C-r>=expand("<cfile>")<CR>
-    "   "   "vnoremap <SID>cscope-includes <Esc>:execute 'cscope find i ' . <SID>GetVisualSelection()
-    "   "   "nnoremap <SID>cscope-includes :execute 'cscope find i ' . expand('<cword>')
-    "   "   "nnoremap <SID>cscope-includes :cscope find i ^<C-r>=expand("<cfile>")<CR>$
-    "   "   "nnoremap <SID>cscope-includes :tab split<CR>:execute "cscope find i " . expand("<cword>")
-    "   "   "nnoremap <SID>cscope-includes :tab split<CR>:execute "cscope find i ^" . expand("<cword>") . "$"
-    "   "   nmap <Leader>sti <SID>cscope-includes
-
-    "   " endif
-    " endif
+        " locate symbols which are not defined in `GTAGS`
+        "vnoremap <SID>gtags-symbols <Esc>:execute 'Gtags -s ' . <SID>GetVisualSelection()
+        Shortcut locate symbols which are not defined in GTAGS 
+            \ nnoremap <Leader>sts :Gtags -s <C-r>=expand("<cword>")<CR>
+    endif
 
   "}}}
 
   " toggles {{{
+    Shortcut toggle automatic symbol highlight 
+        \ nnoremap <silent> <Leader>th :call <SID>AutoHighlightToggle()<CR>
+    call <SID>AutoHighlightToggle()
 
-    " let g:lmap.t = { 'name' : '+toggles' }
+    Shortcut (indent-guides) toggle indent guides 
+        \ nnoremap <silent> <Leader>ti <Plug>IndentGuidesToggle
 
-    " let g:lmap.t.h = { 'name' : '+highlight' }
+    Shortcut (tagbar) toggle tagbar 
+        \ nnoremap <silent> <Leader>tt :TagbarToggle<CR>
 
-    " "nnoremap <SID>automatic-symbol-highlight :if <SID>AutoHighlightToggle()<Bar>set hlsearch<Bar>endif<CR>
-     nnoremap <SID>automatic-symbol-highlight :call <SID>AutoHighlightToggle()<CR>
-     nmap <Leader>th <SID>automatic-symbol-highlight
-     call <SID>AutoHighlightToggle()
 
-    " nmap <silent> <SID>indent-guides <Plug>IndentGuidesToggle
-    " nmap <Leader>ti <SID>indent-guides
-
-     nnoremap <silent> <SID>tabbar :TagbarToggle<CR>
-     nmap <Leader>tt <SID>tabbar
-
-    " nmap <silent> <SID>golden-ratio <Plug>ToggleGoldenViewAutoResize
-    " nmap <Leader>tg <SID>golden-ratio
-
-    " "let g:lmap.t.j = ['call <SID>JustTextToggle()', 'just-text']
-
-    " nnoremap <silent> <SID>just-text :call <SID>JustTextToggle()<CR>
-    " nmap <Leader>tj <SID>just-text
-
-    " nnoremap <silent> <SID>location :call <SID>ListToggle("Location List", 'l')<CR>
-    " nmap <Leader>tl <SID>location
-
-    " nnoremap <silent> <SID>line-numbers :set number!<CR>
-    " nmap <Leader>tn <SID>line-numbers
+    " Toggle between normal and relative numbering.
+    Shortcut toggle between relative and normal numbering 
+        \ nnoremap <leader>tr :call NumberToggle()<CR>
 
     " nnoremap <silent> <SID>quickfix :call <SID>ListToggle("Quickfix List", 'c')<CR>
     " nmap <Leader>tq <SID>quickfix
@@ -1635,261 +1243,72 @@ endif
 
   "}}}
 
-  " " jump {{{
+  "  jump {{{
 
       " Jump to line in current buffer
-      nnoremap <silent> <SID>jump-line :BLines<CR>
-      nmap <Leader>jl <SID>jump-line
+      Shortcut (fzf) jump to line in current buffer 
+          \ nnoremap <silent> <Leader>jl :BLines<CR>
 
       " Jump to line in all open buffers
-      nnoremap <silent> <SID>jump-buffer-line :Lines <CR>
-      nmap <Leader>jd <SID>jump-buffer-line
+      Shortcut (fzf) jump to line in all open buffers 
+          \ nnoremap <silent> <Leader>jd :Lines <CR>
 
-  "     nnoremap <silent> <SID>denite-outline :<C-u>Denite -auto-resize -buffer-name=outline outline<CR>
-  "     nmap <Leader>jo <SID>denite-outline
-  "   " elseif dein#is_sourced('unite.vim')
-  "   "   nnoremap <silent> <SID>unite-line :<C-u>Unite -toggle -auto-resize -buffer-name=line line<CR>
-  "   "   nmap <Leader>jl <SID>unite-line
+      Shortcut (fzf) jump to ctag in all open buffers
+          \ nnoremap <silent> <Leader>jT :Tags<CR>
 
-  "   "   nnoremap <silent> <SID>unite-outline :<C-u>Unite -toggle -auto-resize -buffer-name=outline outline<CR>
-  "   "   nmap <Leader>jo <SID>unite-outline
-  "   endif
+      Shortcut (fzf) jump to ctag in current buffer
+          \ nnoremap <silent> <Leader>jt :BTags<CR>
 
-  "   if dein#is_sourced('unite-gtags') "{{{
+      Shortcut (fzf) jump to mark in current buffer
+          \ nnoremap <silent> <Leader>jm :Marks<CR>
 
-  "     " lists the references or definitions of a word
-  "     " `global --from-here=<location of cursor> -qe <word on cursor>`
-  "     nnoremap <silent> <SID>unite-gtags-context :execute 'Unite gtags/context'<CR>
-  "     nmap <Leader>jc <SID>unite-gtags-context
+      Shortcut (fzf) open file in filesystem
+          \ nnoremap <Space>oF :Locate<Space>
 
-  "     " lists definitions of a word
-  "     " `global -qd -e <pattern>`
-  "     nnoremap <silent> <SID>unite-gtags-def :execute 'Unite gtags/def:'.expand('<cword>')<CR>
-  "     nmap <Leader>jd <SID>unite-gtags-def
-  "     vnoremap <silent> <SID>unite-gtags-def <ESC>:execute 'Unite gtags/def:'.<SID>GetVisualSelection()<CR>
-  "     vmap <Leader>jd <SID>unite-gtags-def
+  " history {{{
+      Shortcut (fzf) repeat command from history
+          \ nnoremap <silent> <Space>:. :History:<Return>
 
-  "     " lists current file's tokens in GTAGS
-  "     " `global -f`
-  "     nnoremap <silent> <SID>unite-gtags-file :execute 'Unite gtags/file'<CR>
-  "     nmap <Leader>jf <SID>unite-gtags-file
+      Shortcut (fzf) repeat search from history
+            \ nnoremap <silent> <Space>:/ :History/<Return>
+  " }}}
 
-  "     " lists grep result of a word
-  "     " `global -qg -e <pattern>`
-  "     nnoremap <silent> <SID>unite-gtags-grep :execute 'Unite gtags/grep:'.expand('<cword>')<CR>
-  "     nmap <Leader>jg <SID>unite-gtags-grep
-  "     vnoremap <silent> <SID>unite-gtags-grep <ESC>:execute 'Unite gtags/grep:'.<SID>GetVisualSelection()<CR>
-  "     vmap <Leader>jg <SID>unite-gtags-grep
+  " windows {{{
 
-  "     " lists all tokens in GTAGS
-  "     " `global -c`
-  "     nnoremap <silent> <SID>unite-gtags-completion :execute 'Unite gtags/completion'<CR>
-  "     nmap <Leader>jm <SID>unite-gtags-completion
+    Shortcut balance windows 
+        \ nnoremap <silent> <Leader>w= <C-w>=
 
-  "     " lists references of a word
-  "     " `global -qrs -e <pattern>`
-  "     nnoremap <silent> <SID>unite-gtags-ref :execute 'Unite gtags/ref:'.expand('<cword>')<CR>
-  "     nmap <Leader>jr <SID>unite-gtags-ref
-  "     vnoremap <silent> <SID>unite-gtags-ref <ESC>:execute 'Unite gtags/ref:'.<SID>GetVisualSelection()<CR>
-  "     vmap <Leader>jr <SID>unite-gtags-ref
+    Shortcut toggle maximize 
+        \ nnoremap <Leader>wm :call <SID>MaximizeToggle()<CR>
 
-  "   endif "}}}
+  " }}}
 
-  "   if dein#is_sourced('unite-airline_themes') && dein#is_sourced('vim-airline')
-  "     nnoremap <silent> <SID>unite-airline-themes :<C-u>Unite -toggle -winheight=10 -auto-preview -buffer-name=airline_themes airline_themes<CR>
-  "     nmap <Leader>ja <SID>unite-airline-themes
-  "   endif
+  " text {{{
+    Shortcut format file 
+        \ nnoremap <Leader>xf :call <SID>Preserve("normal gg=G")<CR>
 
-  "   if dein#is_sourced('denite.nvim')
-  "     nnoremap <silent> <SID>denite-help :<C-u>Denite -auto-resize -buffer-name=help help<CR>
-  "     nmap <Leader>jh <SID>denite-help
-  "   " elseif dein#is_sourced('unite-help')
-  "   "   nnoremap <silent> <SID>unite-help :<C-u>Unite -toggle -auto-resize -buffer-name=help help<CR>
-  "   "   nmap <Leader>jh <SID>unite-help
-  "   endif
+    " repeatable copy and paste. fake the behavior in windows
+    Shortcut repeatable paste 
+        \ nnoremap <Leader>xp viw"zp
 
-  "   if dein#is_sourced('denite.nvim')
-  "     nnoremap <silent> <SID>denite-colorschemes :<C-u>Denite -winheight=10 -auto-preview -buffer-name=colorschemes colorscheme<CR>
-  "     nmap <Leader>js <SID>denite-colorschemes
-  "   " elseif dein#is_sourced('unite-colorscheme')
-  "   "   nnoremap <silent> <SID>unite-colorschemes :<C-u>Unite -toggle -winheight=10 -auto-preview -buffer-name=colorschemes colorscheme<CR>
-  "   "   nmap <Leader>js <SID>unite-colorschemes
-  "   endif
+    Shortcut repeatable copy 
+        \ nnoremap <Leader>xy "zyiw
 
-  "   if dein#is_sourced('junkfile.vim')
-  "     nnoremap <silent> <SID>unite-junkfile :<C-u>Unite -toggle -auto-resize -buffer-name=junk junkfile junkfile/new<CR>
-  "     nmap <Leader>jj <SID>unite-junkfile
-  "   endif
+    Shortcut repeatable paste (visual mode)
+        \ vnoremap <Leader>xp "zp
 
-  "   if dein#is_sourced('unite-tag')
-  "     nnoremap <silent> <SID>unite-tag :<C-u>Unite -toggle -auto-resize -buffer-name=tag tag tag/file<CR>
-  "     nmap <Leader>jt <SID>unite-tag
-  "   endif
+    Shortcut repeatable copy (visual mode) 
+        \ vnoremap <Leader>xy "zy
 
-  "   if dein#is_sourced('neoyank.vim')
-  "     if dein#is_sourced('denite.nvim')
-  "       nnoremap <silent> <SID>unite-history :<C-u>Denite -auto-resize -buffer-name=yanks history/yank<CR>
-  "       nmap <Leader>jy <SID>unite-history
-  "     " elseif dein#is_sourced('unite.vim')
-  "     "   nnoremap <silent> <SID>unite-history :<C-u>Unite -toggle -auto-resize -buffer-name=yanks history/yank<CR>
-  "     "   nmap <Leader>jy <SID>unite-history
-  "     endif
-  "   endif
+    " reselect last paste
+    Shortcut reselect last paste 
+        \ nnoremap <expr> <Leader>xr '`[' . strpart(getregtype(), 0, 1) . '`]'
 
-  " "}}}
+    " formatting
+    Shortcut strip trailing whitespaces 
+        \ nnoremap <Leader>xt :call StripTrailingWhitespace()<CR>
 
-  " " windows {{{
+    Shortcut sort selected lines 
+        \ vnoremap <Leader>xls :sort<CR>
 
-  "   let g:lmap.w = { 'name' : '+windows' }
-
-  "   nnoremap <silent> <SID>balance-windows <C-w>=
-  "   nmap <Leader>w= <SID>balance-windows
-
-  "   let g:lmap.w.a = ['vert sba', 'show-all-buffer']
-
-  "   let g:lmap.w.e = { 'name' : '+sessions' }
-
-  "   let g:lmap.w.e.s = ['SaveSession!', 'save-session']
-
-  "   let g:lmap.w.e.r = ['OpenSession!', 'restore-session']
-
-  "   let g:lmap.w.p = { 'name' : '+postion' }
-
-  "   " cecutil
-  "   map <SID>save-cursor-position <Plug>SaveWinPosn
-  "   map <Leader>wps <SID>save-cursor-position
-
-  "   map <SID>restore-cursor-position <Plug>RestoreWinPosn
-  "   map <Leader>wpr <SID>restore-cursor-position
-
-  "   let g:lmap.w.r = { 'name' : '+resize' }
-
-  "   " increase the window size by a factor
-  "   nnoremap <silent> <SID>increase-width :exe "vertical resize " . (winwidth(0) * 5/4)<CR>
-  "   nmap <Leader>wr= <SID>increase-width
-
-  "   " decrease the window size by a factor
-  "   nnoremap <silent> <SID>decrease-width :exe "vertical resize " . (winwidth(0) * 3/4)<CR>
-  "   nmap <Leader>wr- <SID>decrease-width
-
-  "   nnoremap <SID>maximize-toggle :call <SID>MaximizeToggle()<CR>
-  "   nmap <Leader>wrm <SID>maximize-toggle
-
-  "   let g:lmap.w.s = ['split', 'split-window-below']
-
-  "   let g:lmap.w.t = { 'name' : '+tabs' }
-
-  "   let g:lmap.w.v = ['vsplit', 'split-window-right']
-
-  "   " tab
-  "   nnoremap <SID>tab-new :tabnew<CR>
-  "   nmap <Leader>wtn <SID>tab-new
-
-  "   nnoremap <SID>tab-close :tabclose<CR>
-  "   nmap <Leader>wtc <SID>tab-close
-
-  "   " tabular
-  "   "nmap <Leader>a& :Tabularize /&<CR>
-  "   "vmap <Leader>a& :Tabularize /&<CR>
-  "   "nmap <Leader>a= :Tabularize /=<CR>
-  "   "vmap <Leader>a= :Tabularize /=<CR>
-  "   "nmap <Leader>a: :Tabularize /:<CR>
-  "   "vmap <Leader>a: :Tabularize /:<CR>
-  "   "nmap <Leader>a:: :Tabularize /:\zs<CR>
-  "   "vmap <Leader>a:: :Tabularize /:\zs<CR>
-  "   "nmap <Leader>a, :Tabularize /,<CR>
-  "   "vmap <Leader>a, :Tabularize /,<CR>
-  "   "nmap <Leader>a<Bar> :Tabularize /<Bar><CR>
-  "   "vmap <Leader>a<Bar> :Tabularize /<Bar><CR>
-
-  " "}}}
-
-"   " text {{{
-
-"     let g:lmap.x = { 'name' : '+text' }
-
-"     let g:lmap.x.l = { 'name' : '+lines' }
-
-"     nnoremap <SID>format-file :call <SID>Preserve("normal gg=G")<CR>
-"     nmap <Leader>xf <SID>format-file
-
-"     " repeatable copy and paste. fake the behavior in windows
-"     nnoremap <SID>repeatable-paste viw"zp
-"     nmap <Leader>xp <SID>repeatable-paste
-
-"     nnoremap <SID>repeatable-copy "zyiw
-"     nmap <Leader>xy <SID>repeatable-copy
-
-"     vnoremap <SID>repeatable-paste "zp
-"     vmap <Leader>xp <SID>repeatable-paste
-
-"     vnoremap <SID>repeatable-copy "zy
-"     vmap <Leader>xy <SID>repeatable-copy
-
-"     " reselect last paste
-"     nnoremap <expr> <SID>reselect-last-paste '`[' . strpart(getregtype(), 0, 1) . '`]'
-"     nmap <Leader>xr <SID>reselect-last-paste
-
-"     " formatting
-
-"     " remove the windows ^M when the encodings gets messed up
-"     noremap <SID>remove-windows-endl mmHmt:%s/<C-V><CR>//ge<CR>'tzt'm
-"     nmap <Leader>xm <SID>remove-windows-endl
-
-"     nnoremap <SID>remove-trailing-whitespace :call NavimStripTrailingWhitespace()<CR>
-"     nmap <Leader>xt <SID>remove-trailing-whitespace
-
-"     " eval vimscript by line or visual selection
-"     nnoremap <silent> <SID>eval-vimscript :call <SID>EvalVimscript(line('.'), line('.'))<CR>
-"     nmap <Leader>xe <SID>eval-vimscript
-"     vnoremap <silent> <SID>eval-vimscript :call <SID>EvalVimscript(line('v'), line('.'))<CR>
-"     vmap <Leader>xe <SID>eval-vimscript
-
-"     vnoremap <SID>sort-lines :sort<CR>
-"     vmap <Leader>xls <SID>sort-lines
-
-"   "}}}
-
-"   function! s:my_displayfunc()
-"     let g:leaderGuide#displayname =
-"         \ substitute(g:leaderGuide#displayname, '\c<CR>$', '', '')
-"     let g:leaderGuide#displayname =
-"         \ substitute(g:leaderGuide#displayname, '^<Plug>', '', '')
-"     let g:leaderGuide#displayname =
-"         \ substitute(g:leaderGuide#displayname, '^<SID>', '', '')
-"   endfunction
-"   let g:leaderGuide_displayfunc = [function("s:my_displayfunc")]
-
-"   let g:topdict = {}
-"   let g:topdict[' '] = g:lmap
-"   let g:topdict[' ']['name'] = '<Leader>'
-"   let g:topdict[','] = g:llmap
-"   let g:topdict[',']['name'] = '<LocalLeader>'
-"   call leaderGuide#register_prefix_descriptions("", "g:topdict")
-
-"   nnoremap <silent><nowait> <Leader> :<C-u>LeaderGuide '<Space>'<CR>
-"   vnoremap <silent><nowait> <Leader> :<C-u>LeaderGuideVisual '<Space>'<CR>
-"   map <Leader>. <Plug>leaderguide-global
-
-"   nnoremap <silent><nowait> <LocalLeader> :<C-u>LeaderGuide  ','<CR>
-"   vnoremap <silent><nowait> <LocalLeader> :<C-u>LeaderGuideVisual  ','<CR>
-"   map <LocalLeader>. <Plug>leaderguide-buffer
-
-" "}}}
-
-
-" Search and Replace
-
-" Relative numbering
-  function! NumberToggle()
-    if(&relativenumber == 1)
-        set nornu
-        set number
-    else
-        set rnu
-    endif
-  endfunc
-
-" Toggle between normal and relative numbering.
-  nnoremap <leader>r :call NumberToggle()<cr>
-" nnoremap Q @q   " Use Q to execute default register.
+  " }}}
