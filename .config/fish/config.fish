@@ -1,3 +1,4 @@
+set EDITOR /usr/bin/nvim
 alias config '/usr/bin/git --git-dir=/home/mortacious/.cfg/ --work-tree=/home/mortacious'
 set FZF_DEFAULT_COMMAND 'ag -g ""'
 set FZF_ALT_C_COMMAND 'bfs -type d -nohidden'
