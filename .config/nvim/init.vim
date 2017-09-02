@@ -459,6 +459,11 @@ set shell=/bin/bash
 " syntax highlighting {{{
   " call dein#add('PotatoesMaster/i3-vim-syntax')
     call dein#add('rust-lang/rust.vim')
+    call dein#add('arakashic/chromatica.nvim') " {{{
+        let g:chromatica#enable_at_startup = 1
+        let g:chromatica#dotclangfile_search_path = 'build'
+        let g:chromatica#responsive_mode = 1 " auto update syntax on buffer change instead on return to normal mode
+    " }}}
 
   " color
   set t_Co=256
@@ -1234,6 +1239,10 @@ runtime plugin/shortcut.vim
     " Toggle between normal and relative numbering.
     Shortcut toggle between relative and normal numbering 
         \ nnoremap <leader>tr :call NumberToggle()<CR>
+
+    
+    Shortcut toggle chromatica syntax highlighting
+        \ nnoremap <leader>tc :ChromaticaToggle<CR>
 
     " nnoremap <silent> <SID>quickfix :call <SID>ListToggle("Quickfix List", 'c')<CR>
     " nmap <Leader>tq <SID>quickfix
