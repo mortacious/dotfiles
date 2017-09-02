@@ -459,10 +459,11 @@ set shell=/bin/bash
 " syntax highlighting {{{
   " call dein#add('PotatoesMaster/i3-vim-syntax')
     call dein#add('rust-lang/rust.vim')
-    call dein#add('arakashic/chromatica.nvim') " {{{
-        let g:chromatica#enable_at_startup = 1
-        let g:chromatica#dotclangfile_search_path = 'build'
-        let g:chromatica#responsive_mode = 1 " auto update syntax on buffer change instead on return to normal mode
+    "call dein#add('arakashic/chromatica.nvim', {'on_ft': ['c', 'cpp', 'cc', 'h', 'hh', 'hpp']}) " {{{
+    "    let g:chromatica#enable_at_startup = 1
+    "    let g:chromatica#dotclangfile_search_path = 'build'
+    "    let g:chromatica#responsive_mode = 1 " auto update syntax on buffer change instead on return to normal mode
+    "    "let g:chromatica#libclang_path='/usr/lib/libclang.so'
     " }}}
 
   " color
@@ -521,23 +522,27 @@ set shell=/bin/bash
   call dein#add('tiagofumo/vim-nerdtree-syntax-highlight')
 " }}}  
 
-" " C/C++ Stuff {{{
-"   call dein#add('vim-scripts/a.vim', {'on_ft': ['c','cpp','cc']})
-"   call dein#add('vim-scripts/c.vim', {'on_ft': ['c','cpp','cc']}) " {{{
-"     " <http://stackoverflow.com/questions/736701/class-function-names-highlighting-in-vim>
-"     " highlight class and function names
-"     syn match    cCustomParen    "(" contains=cParen,cCppParen
-"     syn match    cCustomFunc     "\w\+\s*(" contains=cCustomParen
-"     syn match    cCustomScope    "::"
-"     syn match    cCustomClass    "\w\+\s*::" contains=cCustomScope
+"C/C++ Stuff {{{
+    call dein#add('vim-scripts/a.vim', {'on_ft': ['c', 'cpp', 'cc', 'h', 'hh', 'hpp']})
+    call dein#add('vim-scripts/c.vim', {'on_ft': ['c', 'cpp', 'cc', 'h', 'hh', 'hpp']}) " {{{
+        "<http://stackoverflow.com/questions/736701/class-function-names-highlighting-in-vim>
+        "highlight class and function names
+        syn match    cCustomParen    "(" contains=cParen,cCppParen
+        syn match    cCustomFunc     "\w\+\s*(" contains=cCustomParen
+        syn match    cCustomScope    "::"
+        syn match    cCustomClass    "\w\+\s*::" contains=cCustomScope
 
-"     hi def link cCustomFunc  Function
-"     hi def link cCustomClass CTagsClass
-"   " }}}
-"   call dein#add('vim-scripts/echofunc.vim', {'on_ft': ['c','cpp','cc']})
-"   call dein#add('vim-scripts/google.vim', {'on_ft': ['c','cpp','cc']})
-"   call dein#add('vim-scripts/STL-improved', {'on_ft': ['c','cpp','cc']})
-"   call dein#add('octol/vim-cpp-enhanced-highlight', {'on_ft': ['c','cpp','cc']})
+        hi def link cCustomFunc  Function
+        hi def link cCustomClass CTagsClass
+    " }}}
+    call dein#add('vim-scripts/STL-improved', {'on_ft': ['c', 'cpp', 'cc', 'h', 'hh', 'hpp']})
+    call dein#add('octol/vim-cpp-enhanced-highlight', {'on_ft': ['c', 'cpp', 'cc', 'h', 'hh', 'hpp']}) " {{{
+        let g:cpp_class_scope_highlight = 1
+        let g:cpp_member_variable_highlight = 1
+        let g:cpp_class_decl_highlight = 1
+        let g:cpp_experimental_template_highlight = 1
+        let g:cpp_concepts_highlight = 1
+    " }}}
 " " }}}
 
 " Completition {{{
@@ -914,25 +919,26 @@ runtime plugin/shortcut.vim
 
   " highlight all instances of word under cursor, when idle.
   " useful when studying strange source code.
-   function! <SID>AutoHighlightToggle() " {{{
-     let @/ = ''
-     if exists('#auto_highlight')
-       autocmd! auto_highlight
-       augroup! auto_highlight
-       setlocal updatetime=4000
-       echo 'Highlight current word: off'
-       return 0
-     else
-       augroup auto_highlight
-          autocmd!
-          " 3match conflicts with airline
-          autocmd CursorHold * silent! execute printf('2match WarningMsg /\<%s\>/', expand('<cword>'))
-          augroup end
-          setlocal updatetime=20
-          " echo 'Highlight current word: on'
-          return 1
-     endif
-   endfunction " }}}
+    " <http://vim.wikia.com/wiki/Auto_highlight_current_word_when_idle>
+    function! AutoHighlightToggle()
+        let @/ = ''
+        if exists('#auto_highlight')
+            autocmd! auto_highlight
+            augroup! auto_highlight
+            setlocal updatetime=4000
+            echo 'Highlight current word: off'
+            return 0
+        else
+            augroup auto_highlight
+            autocmd!
+            " 3match conflicts with airline
+            autocmd CursorHold * silent! execute printf('2match WarningMsg /\<%s\>/', expand('<cword>'))
+            augroup end
+            setlocal updatetime=20
+            " echo 'Highlight current word: on'
+            return 1
+        endif
+    endfunction
 
   " maximize or restore current window in split structure
   " <http://vim.wikia.com/wiki/Maximize_window_and_return_to_previous_split_structure>
@@ -1226,8 +1232,8 @@ runtime plugin/shortcut.vim
 
   " toggles {{{
     Shortcut toggle automatic symbol highlight 
-        \ nnoremap <silent> <Leader>th :call <SID>AutoHighlightToggle()<CR>
-    call <SID>AutoHighlightToggle()
+        \ nnoremap <silent> <Leader>th :call AutoHighlightToggle()<CR>
+    call AutoHighlightToggle() " enable default autohighlighting
 
     Shortcut (indent-guides) toggle indent guides 
         \ nnoremap <silent> <Leader>ti <Plug>IndentGuidesToggle
