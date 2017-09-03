@@ -1,3 +1,4 @@
+set nocompatible
 set shell=/bin/bash
 
 
@@ -37,7 +38,6 @@ set shell=/bin/bash
       execute 'set tags+=' . f
     endfor
   endfunction "}}}
-
 "}}}
 
 " init {{{
@@ -55,7 +55,6 @@ set shell=/bin/bash
 " }}}
 
 " General Setup and dein {{{
-  set nocompatible
   filetype off
   set all& " reset everything to defaults
 
@@ -547,7 +546,7 @@ set shell=/bin/bash
 
 " Completition {{{
   call dein#add('honza/vim-snippets')
-  call dein#add('oblitum/youcompleteme') " {{{
+  call dein#add('oblitum/youcompleteme', {'build': './install.py --all'}) " {{{
     set completeopt=longest,menu
     let g:ycm_confirm_extra_conf = 0
     let g:ycm_complete_in_comments = 1
@@ -560,6 +559,8 @@ set shell=/bin/bash
 
     noremap gd :YcmCompleter GoToDefinitionElseDeclaration<cr>
     let g:ycm_python_binary_path='python'
+    "let g:ycm_path_to_python_interpreter = '/usr/bin/python3'
+    "let g:ycm_server_python_interpreter = '/usr/bin/python3'
     " Global ycm extra conf that searches and parses a compile_commands.json automatically
     let g:ycm_global_ycm_extra_conf = GetDir('ycm') . g:path_separator . '.ycm_extra_conf.py'
     let g:ycm_add_preview_to_completeopt = 1
@@ -848,7 +849,7 @@ call dein#end()
 if dein#check_install()
   call dein#install()
 endif
-
+"call dein#recache_runtimepath() " just in case to fix stupid ycm error (ycm_core.so is mssing in the dein runtimepath)
 runtime plugin/shortcut.vim
 
 " Autocommands {{{

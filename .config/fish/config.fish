@@ -1,7 +1,13 @@
+set -x LC_MESSAGES C.UTF-8
+set -x LC_LANG en_US.UTF-8
+set fish_greeting
 set EDITOR /usr/bin/nvim
 alias config '/usr/bin/git --git-dir=/home/mortacious/.cfg/ --work-tree=/home/mortacious'
 set FZF_DEFAULT_COMMAND 'ag -g ""'
 set FZF_ALT_C_COMMAND 'bfs -type d -nohidden'
+
+fundle plugin 'edc/bass'
+fundle install > /dev/null
 
 # usage: tm <session-name>
 # if session-name is provided tm tries to attach to that session else fzf search is done for the sessions
