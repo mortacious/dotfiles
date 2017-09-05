@@ -1,8 +1,8 @@
-set -x LC_MESSAGES C.UTF-8
+set -x LC_MESSAGES C
 set -x LC_LANG en_US.UTF-8
 set fish_greeting
-set EDITOR /usr/bin/nvim
-alias config '/usr/bin/git --git-dir=/home/mortacious/.cfg/ --work-tree=/home/mortacious'
+set -x EDITOR /usr/bin/nvim
+alias config '/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
 set FZF_DEFAULT_COMMAND 'ag -g ""'
 set FZF_ALT_C_COMMAND 'bfs -type d -nohidden'
 
@@ -27,3 +27,22 @@ function tm --argument-names 'name'
         tmux new-session -s $newsession
     end
 end
+
+# store the bedrock context for tmux
+set -x BEDROCK_CONTEXT (brw)
+if test $TMUX
+    set PANENUM (tmux display -p "#D" | tr -d \%)
+    set BEDROCK_CONTEXT_OLD (tmux showenv -g | grep TMUX_BRCONTEXT_$PANENUM | sed 's/^.*=//')
+    function restore_context --on-process %self
+        # exit stuff goes here
+        if test $BEDROCK_CONTEXT_OLD
+            tmux setenv -g TMUX_BRCONTEXT_$PANENUM $BEDROCK_CONTEXT_OLD
+            tmux refresh-client -S 
+        end
+    end
+    tmux setenv -g TMUX_BRCONTEXT_$PANENUM $BEDROCK_CONTEXT
+    tmux refresh-client -S
+end
+
+# source ros stuff
+bass source /bedrock/brpath/ros/kinetic/setup.bash

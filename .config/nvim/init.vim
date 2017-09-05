@@ -1163,7 +1163,7 @@ runtime plugin/shortcut.vim
         \ vnoremap <silent> <Leader>sf :call fzf#vim#buffer_lines(<SID>GetVisualSelection())<CR>
 
     Shortcut (fzf) go to line in any file in directory
-        \ nnoremap <silent> <Space>'F :Ag<Return>
+        \ nnoremap <silent> <Space>jF :Ag<Return>
 
 
     " " search specific content in current directory
@@ -1279,7 +1279,7 @@ runtime plugin/shortcut.vim
           \ nnoremap <silent> <Leader>jm :Marks<CR>
 
       Shortcut (fzf) open file in filesystem
-          \ nnoremap <Space>oF :Locate<Space>
+          \ nnoremap <Space>fF :Locate<Space>
 
   " history {{{
       Shortcut (fzf) repeat command from history
