@@ -38,6 +38,9 @@ if test $TMUX
         if test $BEDROCK_CONTEXT_OLD
             tmux setenv -g TMUX_BRCONTEXT_$PANENUM $BEDROCK_CONTEXT_OLD
             tmux refresh-client -S 
+        else
+            # remove the tmux variable again
+            tmux setenv -g -u TMUX_BRCONTEXT_$PANENUM
         end
     end
     tmux setenv -g TMUX_BRCONTEXT_$PANENUM $BEDROCK_CONTEXT
