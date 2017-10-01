@@ -595,11 +595,11 @@ set shell=/bin/bash
 " }}}
 
 " Indents {{{
-  call dein#add('nathanaelkane/vim-indent-guides') " {{{
+  call dein#add('nathanaelkane/vim-indent-guides',{'on_cmd':['IndentGuidesEnable', 'IndentGuidesDisable', 'IndentGuidesToggle']}) " {{{
     let g:indent_guides_start_level = 1
     let g:indent_guides_guide_size = 1
     let g:indent_guides_enable_on_vim_startup = 1
-    let g:indent_guides_exclude_filetypes = ['help', 'startify', 'man', 'rogue', 'fzf']
+    let g:indent_guides_exclude_filetypes = ['help', 'startify', 'man', 'rogue', 'fzf', 'denite']
 
     " let g:indent_guides_color_change_percent = 3
   " }}}
@@ -724,11 +724,14 @@ set shell=/bin/bash
       \ 'ListLocalMarkers'   :  "m?"
       \ }
   " }}}
+
+  call dein#add('wesQ3/vim-windowswap')
   
   " ./install --all so the interactive script doesn't block
   " you can check the other command line options  in the install file
   call dein#add('junegunn/fzf', { 'build': './install --all', 'merged': 0, 'rtp': '' }) 
   call dein#add('junegunn/fzf.vim', { 'depends': 'fzf' }) " {{{
+
     let $FZF_DEFAULT_COMMAND = 'ag -g "" --one-device --skip-vcs-ignores --smart-case '
     function! s:update_fzf_colors()
       let rules =
@@ -764,6 +767,15 @@ set shell=/bin/bash
       autocmd VimEnter,ColorScheme * call s:update_fzf_colors()
     augroup END
 
+    " CTRL-A CTRL-Q to select all and build quickfix list
+    function! s:build_quickfix_list(lines)
+      call setqflist(map(copy(a:lines), '{ "filename": v:val }'))
+      copen
+      cc
+    endfunction
+
+    "command! -bang -nargs=* Ag call fzf#vim#ag(<q-args>, {'options': '--delimiter : --nth 4..'}, <bang>0)
+
     " Files + devicons <https://github.com/ryanoasis/vim-devicons/issues/106>
     " function! Fzf_dev()
     "   function! s:files()
@@ -795,9 +807,11 @@ set shell=/bin/bash
     "         \ 'down':    '40%' })
     " endfunction
 
-    "command! -bang -nargs=? -complete=dir Files
-    "   \ call fzf#vim#files(<q-args>, fzf#vim#with_preview(), <bang>0)
+    command! -bang -nargs=? -complete=dir Files
+       \ call fzf#vim#files(<q-args>, 
+       \ <bang>0 ? fzf#vim#with_preview('up:60%') : fzf#vim#with_preview('right:50%:hidden', '?'), <bang>0)
 
+    command! -bar -bang -nargs=? -complete=buffer Buffers  call fzf#vim#buffers(<q-args>,{'options':'--bind "ctrl-d:execute(echo hello)"'}, <bang>0)
     "fzf#vim#with_preview()['options']
       let g:fzf_files_options = 
         \ '--preview "highlight -O ansi -l {} 2> /dev/null ;or cat {} 2> /dev/null | head -'.&lines.'"'
@@ -806,6 +820,8 @@ set shell=/bin/bash
   call dein#add('sunaku/vim-shortcut', { 'depends': 'fzf.vim' }) " {{{
 
   " }}}
+
+  call dein#add('thinca/vim-qfreplace')
 
   call dein#add('majutsushi/tagbar', {'on_cmd': 'TagbarToggle'}) " {{{
     let g:tagbar_left = 1
@@ -901,22 +917,22 @@ runtime plugin/shortcut.vim
 
 " useful functions {{{
 
-  function! <SID>CloseWindowOrKillBuffer() " {{{
-    " never bdelete a nerd tree
-    if matchstr(expand("%"), 'NERD') ==# 'NERD'
-      wincmd c
-      return
-    endif
+    function! CloseWindowOrKillBuffer() " {{{
+        " never bdelete a nerd tree
+        if matchstr(expand("%"), 'NERD') ==# 'NERD'
+            wincmd c
+            return
+        endif
 
-    let number_of_windows_to_this_buffer =
-        \ len(filter(range(1, winnr('$')), "winbufnr(v:val) == bufnr('%')"))
+        let number_of_windows_to_this_buffer =
+            \ len(filter(range(1, winnr('$')), "winbufnr(v:val) == bufnr('%')"))
 
-    if number_of_windows_to_this_buffer > 1
-      wincmd c
-    else
-      bdelete
-    endif
-  endfunction "}}}
+        if number_of_windows_to_this_buffer > 1
+            wincmd c
+        else
+            bdelete
+        endif
+    endfunction "}}}
 
   " highlight all instances of word under cursor, when idle.
   " useful when studying strange source code.
@@ -1075,7 +1091,7 @@ runtime plugin/shortcut.vim
 
   " window killer
     Shortcut close window or kill buffer 
-        \ nnoremap <silent> Q :call <SID>CloseWindowOrKillBuffer()<CR>
+        \ nnoremap <silent> Q :call CloseWindowOrKillBuffer()<CR>
 
   " applications {{{
     Shortcut (undotree) toggle undotree 
