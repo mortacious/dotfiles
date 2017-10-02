@@ -442,7 +442,7 @@ set shell=/bin/bash
   call dein#add('tpope/vim-surround')
   " call dein#add('tpope/vim-repeat')
 
-  call dein#add('skywind3000/asyncrun.vim')
+  call dein#add('skywind3000/asyncrun.vim',{'on_cmd':['AsyncRun', 'AsyncRun!']})
   " call dein#add('tpope/vim-eunuch')
   " call dein#add('tpope/vim-unimpaired') " {{{
   "   nmap <C-Up> [e
@@ -457,7 +457,7 @@ set shell=/bin/bash
 
 " syntax highlighting {{{
   " call dein#add('PotatoesMaster/i3-vim-syntax')
-    call dein#add('rust-lang/rust.vim')
+    call dein#add('rust-lang/rust.vim', {'on_ft':['rs']})
     "call dein#add('arakashic/chromatica.nvim', {'on_ft': ['c', 'cpp', 'cc', 'h', 'hh', 'hpp']}) " {{{
     "    let g:chromatica#enable_at_startup = 1
     "    let g:chromatica#dotclangfile_search_path = 'build'
@@ -482,7 +482,7 @@ set shell=/bin/bash
 
 
 " NERDTree"
-  call dein#add('scrooloose/nerdtree')
+  call dein#add('scrooloose/nerdtree', {'on_cmd':['NERDTreeToggle']})
     let g:NERDTreeDirArrows = 1
     let g:NERDTreeDirArrowExpandable = '▸'
     let g:NERDTreeDirArrowCollapsible = '▾'
@@ -517,8 +517,8 @@ set shell=/bin/bash
     " close vim if the only window left open is a nerdtree
     autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType ==# "primary") | q | endif
 
-  call dein#add('Xuyuanp/nerdtree-git-plugin')
-  call dein#add('tiagofumo/vim-nerdtree-syntax-highlight')
+  call dein#add('Xuyuanp/nerdtree-git-plugin',{'on_cmd':['NERDTreeToggle']})
+  call dein#add('tiagofumo/vim-nerdtree-syntax-highlight',{'on_cmd':['NERDTreeToggle']})
 " }}}  
 
 "C/C++ Stuff {{{
@@ -570,8 +570,9 @@ set shell=/bin/bash
     let g:ycm_key_list_select_completion = ['<C-n>','<Down>']
     let g:ycm_key_list_previous_completion = ['<C-p>','<Up>']
     let g:ycm_filetype_blacklist = {'unite': 1}
+    let g:ycm_rust_src_path = systemlist("rustc --print sysroot")[0]."/lib/rustlib/src/rust/src"
   " }}}
-  call dein#add('IngoHeimbach/neco-vim')
+  call dein#add('IngoHeimbach/neco-vim',{'on_ft':['vim']})
   call dein#add('SirVer/ultisnips') " {{{
     let g:UltiSnipsExpandTrigger = "<Tab>"
     let g:UltiSnipsJumpForwardTrigger = "<Tab>"
@@ -639,9 +640,9 @@ set shell=/bin/bash
    let g:fencview_checklines = 100
    let g:fencview_auto_patterns = '*'
   " }}}
-  call dein#add('jtratner/vim-flavored-markdown', {'on_ft': ['markdown','ghmarkdown']})
+  call dein#add('jtratner/vim-flavored-markdown', {'on_ft': ['markdown','ghmarkdown', 'md']})
   if executable('instant-markdown-d')
-    call dein#add('suan/vim-instant-markdown', {'on_ft': ['markdown','ghmarkdown']})
+    call dein#add('suan/vim-instant-markdown', {'on_ft': ['markdown','ghmarkdown','md']})
   endif
   call dein#add('guns/xterm-color-table.vim', {'on_cmd': 'XtermColorTable'})
 
@@ -811,7 +812,7 @@ set shell=/bin/bash
        \ call fzf#vim#files(<q-args>, 
        \ <bang>0 ? fzf#vim#with_preview('up:60%') : fzf#vim#with_preview('right:50%:hidden', '?'), <bang>0)
 
-    command! -bar -bang -nargs=? -complete=buffer Buffers  call fzf#vim#buffers(<q-args>,{'options':'--bind "ctrl-d:execute(echo hello)"'}, <bang>0)
+    "command! -bar -bang -nargs=? -complete=buffer Buffers  call fzf#vim#buffers(<q-args>,{'options':'--bind "ctrl-d:execute(echo hello)"'}, <bang>0)
     "fzf#vim#with_preview()['options']
       let g:fzf_files_options = 
         \ '--preview "highlight -O ansi -l {} 2> /dev/null ;or cat {} 2> /dev/null | head -'.&lines.'"'
@@ -821,7 +822,7 @@ set shell=/bin/bash
 
   " }}}
 
-  call dein#add('thinca/vim-qfreplace')
+  call dein#add('thinca/vim-qfreplace',{'on_cmd':['Qfreplace']})
 
   call dein#add('majutsushi/tagbar', {'on_cmd': 'TagbarToggle'}) " {{{
     let g:tagbar_left = 1
@@ -916,7 +917,6 @@ runtime plugin/shortcut.vim
 " }}}
 
 " useful functions {{{
-
     function! CloseWindowOrKillBuffer() " {{{
         " never bdelete a nerd tree
         if matchstr(expand("%"), 'NERD') ==# 'NERD'
