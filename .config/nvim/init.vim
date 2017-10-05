@@ -443,6 +443,9 @@ set shell=/bin/bash
   " call dein#add('tpope/vim-repeat')
 
   call dein#add('skywind3000/asyncrun.vim',{'on_cmd':['AsyncRun', 'AsyncRun!']})
+  augroup vimrc
+    autocmd QuickFixCmdPost * botright copen 8
+  augroup END
   " call dein#add('tpope/vim-eunuch')
   " call dein#add('tpope/vim-unimpaired') " {{{
   "   nmap <C-Up> [e
@@ -544,95 +547,7 @@ set shell=/bin/bash
     " }}}
     
     " CMake with AsyncRun {{{
-        " from  https://github.com/vhdirk/vim-cmake/blob/master/plugin/cmake.vim#L28
-        command! -nargs=? CMake call s:cmake(<f-args>)
-        command! -nargs=? Make call s:make(<f-args>)
-        command! CMakeClean call s:cmakeclean()
-        " Utility function
-        " Thanks to tpope/vim-fugitive
-        function! s:fnameescape(file) abort
-            if exists('*fnameescape')
-                return fnameescape(a:file)
-            else
-                return escape(a:file," \t\n*?[{`$\\%#'\"|!<")
-            endif
-        endfunction
-
-        function! s:cmakeclean()
-
-            let s:build_dir = finddir('build', '.;')
-            if s:build_dir !=""
-                echo system("rm -r '" . s:build_dir. "'/*" )
-                echo "Build directory has been cleaned."
-            else
-                echo "Unable to find build directory."
-            endif
-        endfunction
-
-        function! s:make(...)
-
-            let g:cmake_build_dir = get(g:, 'cmake_build_dir', 'build')
-            let s:build_dir = finddir(g:cmake_build_dir, '.;')
-
-            exec 'cd' s:fnameescape(s:build_dir)
-
-            let s:cmd = 'make '. " ". join(a:000)
-            echo s:cmd
-            execute 'AsyncRun' s:cmd
-            exec 'cd - '
-        endfunction
-
-        function! s:cmake(...)
-            let g:cmake_build_dir = get(g:, 'cmake_build_dir', 'build')
-            let s:build_dir = finddir(g:cmake_build_dir, '.;')
-
-            if s:build_dir !=""
-
-                let &makeprg='cmake --build ' . shellescape(s:build_dir) . ' --target '
-
-                exec 'cd' s:fnameescape(s:build_dir)
-
-                let s:cleanbuild = 0
-                let l:argument=[]
-                if exists("g:cmake_project_generator")
-                    let l:argument+= [ "-G \"" . g:cmake_project_generator . "\"" ]
-                endif
-                if exists("g:cmake_install_prefix")
-                    let l:argument+=  [ "-DCMAKE_INSTALL_PREFIX:FILEPATH="  . g:cmake_install_prefix ]
-                endif
-                if exists("g:cmake_build_type" )
-                    let l:argument+= [ "-DCMAKE_BUILD_TYPE:STRING="         . g:cmake_build_type ]
-                endif
-                if exists("g:cmake_cxx_compiler")
-                    let l:argument+= [ "-DCMAKE_CXX_COMPILER:FILEPATH="     . g:cmake_cxx_compiler ]
-                    let s:cleanbuild = 1
-                endif
-                if exists("g:cmake_c_compiler")
-                    let l:argument+= [ "-DCMAKE_C_COMPILER:FILEPATH="       . g:cmake_c_compiler ]
-                    let s:cleanbuild = 1
-                endif
-                if exists("g:cmake_build_shared_libs")
-                    let l:argument+= [ "-DBUILD_SHARED_LIBS:BOOL="          . g:cmake_build_shared_libs ]
-                endif
-                if exists("g:cmake_usr_args")
-                    let l:argument+= [ g:cmake_usr_args ]
-                endif
-                let l:argumentstr = join(l:argument, " ")
-
-                if s:cleanbuild > 0
-                    echo system("rm -r *" )
-                endif
-
-                let s:cmd = 'cmake '. l:argumentstr . " " . join(a:000) .' .. '
-                echo s:cmd
-                execute 'AsyncRun' s:cmd
-                exec 'cd - '
-
-            else
-                echo "Unable to find build directory."
-            endif
-        endfunction
-
+    call dein#add('mortacious/vim-cmake', {'on_cmd': ['CMake', 'CMakeClean', 'Make'], 'depends':['asyncrun.vim']})
     " }}}
 " " }}}
 
