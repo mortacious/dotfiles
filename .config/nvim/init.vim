@@ -255,7 +255,7 @@ set shell=/bin/bash
 
 
     let g:lightline = {
-    \ 'colorscheme': 'onedark',
+    \ 'colorscheme': 'one',
     \ 'active': {
     \ 'left': [ [ 'mode', 'paste' ], [ 'fugitive', 'filename' ], [ 'buffertag' ], ],
     \ 'right': [ [ 'lineinfo', 'syntaxcheck' ], [ 'fileinfo' ], [ 'filetype' ], ],
@@ -437,7 +437,6 @@ set shell=/bin/bash
   call dein#add('taohex/lightline-buffer', {'depends': 'itchyny/lightline.vim'})
 
 
-
   call dein#add('ryanoasis/vim-devicons')
   call dein#add('tpope/vim-surround')
   " call dein#add('tpope/vim-repeat')
@@ -455,7 +454,8 @@ set shell=/bin/bash
   " " }}}
 
 " color schemes {{{
-  call dein#add('joshdick/onedark.vim')
+  "call dein#add('joshdick/onedark.vim')
+  call dein#add('chriskempson/base16-vim')
 " }}}
 
 " syntax highlighting {{{
@@ -471,7 +471,7 @@ set shell=/bin/bash
   " color
   set t_Co=256
   set background=dark
-  colorscheme onedark
+  colorscheme base16-onedark
   if (has("termguicolors"))
       set termguicolors
   endif
@@ -545,6 +545,7 @@ set shell=/bin/bash
         let g:cpp_experimental_template_highlight = 1
         let g:cpp_concepts_highlight = 1
     " }}}
+    call dein#add('skogler/vim-protodef',{'on_ft': ['c', 'cpp', 'cc', 'h', 'hh', 'hpp']})
     
     " CMake with AsyncRun {{{
     call dein#add('mortacious/vim-cmake', {'on_cmd': ['CMake', 'CMakeClean', 'Make'], 'depends':['asyncrun.vim']})

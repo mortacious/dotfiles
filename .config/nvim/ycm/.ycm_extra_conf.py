@@ -47,7 +47,7 @@ HEADER_DIRECTORIES = [
         'include'
         ]
 
-BUILD_DIRECTORY = 'build';
+BUILD_DIRECTORY = 'build'
 
 def IsHeaderFile(filename):
     extension = os.path.splitext(filename)[1]
@@ -166,7 +166,7 @@ def FlagsForFile(filename):
     root = os.path.realpath(filename);
     compilation_db_flags = FlagsForCompilationDatabase(root, filename)
     if compilation_db_flags:
-        final_flags = compilation_db_flags
+        final_flags = BASE_FLAGS + compilation_db_flags
     else:
         final_flags = BASE_FLAGS
         clang_flags = FlagsForClangComplete(root)
