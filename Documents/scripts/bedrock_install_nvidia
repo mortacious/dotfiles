@@ -1,0 +1,36 @@
+#!/usr/bin/python3
+
+import wget
+import os
+import sys
+import re
+from subprocess import check_output, call
+from pathlib import Path
+
+if len(sys.argv) < 2:
+    print("need at least one stratum to update the driver")
+    exit()
+
+url_format = 'http://us.download.nvidia.com/XFree86/Linux-x86_64/{major}.{minor}/NVIDIA-Linux-x86_64-{major}.{minor}.run'
+version_outp = check_output(['pacman', "-Q", "nvidia"])
+match = re.search(r'nvidia\s*([\d]+).([\d]+)',version_outp.decode("utf-8")) 
+
+major = match.group(1)
+minor = match.group(2)
+
+url = url_format.format(major=major, minor=minor)
+
+download_file = Path(os.getcwd() + "/NVIDIA-Linux-x86_64-{major}.{minor}.run".format(major=major, minor=minor))
+if not download_file.is_file():
+    print("Downloading version {major}.{minor}".format(major=major, minor=minor))
+    download_file = wget.download(url)
+
+for stratum in sys.argv[1:]:
+    print("Installing on stratum", stratum, "...")
+    version_outp = call(['brc', stratum, 'sudo', 'sh', download_file, '--no-kernel-module', '--no-check-for-alternate-installs', '--no-x-check', '-silent'])
+    if version_outp == 0:
+        print("done")
+    else:
+        print("Installation on stratum ", stratum, "failed")
+
+print("Installation complete")
