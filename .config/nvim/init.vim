@@ -461,6 +461,7 @@ set shell=/bin/bash
 " syntax highlighting {{{
   " call dein#add('PotatoesMaster/i3-vim-syntax')
     call dein#add('rust-lang/rust.vim', {'on_ft':['rs']})
+    call dein#add('PontusPersson/pddl.vim', {'on_ft':['pddl']})
     "call dein#add('arakashic/chromatica.nvim', {'on_ft': ['c', 'cpp', 'cc', 'h', 'hh', 'hpp']}) " {{{
     "    let g:chromatica#enable_at_startup = 1
     "    let g:chromatica#dotclangfile_search_path = 'build'
