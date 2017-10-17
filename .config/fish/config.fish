@@ -1,5 +1,6 @@
 set -x LC_MESSAGES C
 set -x LC_LANG en_US.UTF-8
+set -x LANGUAGE en_US.UTF-8
 set fish_greeting
 set -x EDITOR /usr/bin/nvim
 alias config '/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
@@ -48,4 +49,5 @@ if test $TMUX
 end
 
 # source ros stuff
-bass source /bedrock/brpath/ros/kinetic/setup.bash
+bass source /bedrock/brpath/ros/kinetic/setup.bash 2>/dev/null
+source /bedrock/brpath/ros/kinetic/share/rosbash/rosfish
