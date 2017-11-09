@@ -1,0 +1,3 @@
+[submodule ".emacs.d/private/spacemacs-cmake-ide"]
+	path = .emacs.d/private/spacemacs-cmake-ide
+	url = https://github.com/ausimian/spacemacs-cmake-ide.git
