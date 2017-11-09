@@ -36,7 +36,7 @@ values."
      ;; Example of useful layers you may want to use right away.
      ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
      ;; <M-m f e R> (Emacs style) to install them.
-     ;; ----------------------------------------------------------------
+     ;; ---------repository-------------------------------------------------------
      helm
      auto-completion
      ;; better-defaults
@@ -62,12 +62,12 @@ values."
      (shell :variables
             shell-default-shell 'multi-term
             shell-default-term-shell "/usr/bin/fish"
-            shell-default-position 'right
             shell-default-height 40)
      (latex :variables
             latex-build-command "LaTeX")
 
-     spacemacs-cmake-ide
+     (spacemacs-cmake-ide :variables
+            cmake-ide-flags-c++ '("-std=c++14" "-I/usr/include/c++/7.2.0"))
      python
      )
    ;; List of additional packages that will be installed without being
