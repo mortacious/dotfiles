@@ -12,6 +12,7 @@ set -x LC_LANG en_US.UTF-8
 set -x LANGUAGE en_US.UTF-8
 set fish_greeting
 set -x EDITOR /usr/bin/nvim
+set -x ALTERNATE_EDITOR ""
 alias config '/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
 set FZF_DEFAULT_COMMAND 'ag -g ""'
 set FZF_ALT_C_COMMAND 'bfs -type d -nohidden'
@@ -30,13 +31,18 @@ function tm --argument-names 'name'
     end
     echo "newsession: $newsession"
     set session (tmux list-sessions -F "#{session_name}" | fzf --query="$name" --select-1 --exit-0)
-    echo "session name: $session"
+    echo "session name: $session" 
     if test -n "$session"
         tmux attach-session -t "$session"
     else
         tmux new-session -s $newsession
     end
 end
+
+alias em "emacsclient -cn"
+alias emt "emacsclient -ct"
+
+
 
 # store the bedrock context for tmux
 set -x BEDROCK_CONTEXT (brw)
@@ -58,5 +64,5 @@ if test $TMUX
 end
 
 # source ros stuff
-bass source /bedrock/brpath/ros/kinetic/setup.bash 2>/dev/null
+#bass source /bedrock/brpath/ros/kinetic/setup.bash 2>/dev/null
 source /bedrock/brpath/ros/kinetic/share/rosbash/rosfish
