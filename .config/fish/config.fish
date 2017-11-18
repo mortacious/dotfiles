@@ -32,7 +32,7 @@ end
 
 alias em "emacsclient -cn"
 alias emt "emacsclient -ct"
-
+alias clion "~/Documents/scripts/clion"
 
 
 # store the bedrock context for tmux
