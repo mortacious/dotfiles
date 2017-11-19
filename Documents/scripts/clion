@@ -1,4 +1,3 @@
 #!/bin/bash
 dir=$(ls -1 "/bedrock/strata/arch/opt/JetBrains/apps/CLion/ch-0/" | sort -V | tail -1)
-/bedrock/strata/arch/opt/JetBrains/apps/CLion/ch-0/$dir/bin/clion.sh
-
+/bedrock/strata/arch/opt/JetBrains/apps/CLion/ch-0/$dir/bin/clion.sh </dev/null &>/dev/null &

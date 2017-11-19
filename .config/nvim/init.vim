@@ -683,6 +683,8 @@ set shell=/bin/bash
      let g:ale_statusline_format = ['⨉ %d', '⚠ %d', '✔︎']
      let g:ale_sign_error = '⨉'
      let g:ale_sign_warning = '⚠'
+     let g:ale_c_build_dir = 'build'
+     let g:ale_linters = {'cpp': ['clangcheck', 'clang-format', 'clangtidy']}
   " }}}
   "}}}
 
