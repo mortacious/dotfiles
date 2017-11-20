@@ -683,6 +683,8 @@ set shell=/bin/bash
      let g:ale_statusline_format = ['⨉ %d', '⚠ %d', '✔︎']
      let g:ale_sign_error = '⨉'
      let g:ale_sign_warning = '⚠'
+     let g:ale_c_build_dir = 'build'
+     let g:ale_linters = {'cpp': ['clangcheck', 'clang-format', 'clangtidy']}
   " }}}
   "}}}
 
@@ -826,7 +828,7 @@ set shell=/bin/bash
       let g:fzf_files_options = 
         \ '--preview "highlight -O ansi -l {} 2> /dev/null ;or cat {} 2> /dev/null | head -'.&lines.'"'
   " "}}}
-
+  call dein#add('airblade/vim-rooter')
   call dein#add('sunaku/vim-shortcut', { 'depends': 'fzf.vim' }) " {{{
 
   " }}}

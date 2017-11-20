@@ -41,7 +41,7 @@ end
 
 alias em "emacsclient -cn"
 alias emt "emacsclient -ct"
-
+alias clion "~/Documents/scripts/clion"
 
 
 # store the bedrock context for tmux
@@ -64,5 +64,5 @@ if test $TMUX
 end
 
 # source ros stuff
-#bass source /bedrock/brpath/ros/kinetic/setup.bash 2>/dev/null
+bass source /bedrock/brpath/ros/kinetic/setup.bash 2>/dev/null
 source /bedrock/brpath/ros/kinetic/share/rosbash/rosfish
