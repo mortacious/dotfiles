@@ -1,3 +1,12 @@
+if test -n "$EMACS"
+  set -x TERM eterm-color
+end
+
+function fish_title
+  true
+end
+
+
 set -x LC_MESSAGES C
 set -x LC_LANG en_US.UTF-8
 set -x LANGUAGE en_US.UTF-8
