@@ -55,5 +55,7 @@ if test $TMUX
 end
 
 # source ros stuff
-bass source /bedrock/brpath/ros/kinetic/setup.bash 2>/dev/null
-source /bedrock/brpath/ros/kinetic/share/rosbash/rosfish
+if test $BEDROCK_CONTEXT = "ubuntu-lts"
+    bass source /bedrock/brpath/ros/kinetic/setup.bash 2>/dev/null
+    source /bedrock/brpath/ros/kinetic/share/rosbash/rosfish
+end 
