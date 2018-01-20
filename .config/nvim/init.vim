@@ -468,6 +468,8 @@ set shell=/bin/bash
     "    let g:chromatica#responsive_mode = 1 " auto update syntax on buffer change instead on return to normal mode
     "    "let g:chromatica#libclang_path='/usr/lib/libclang.so'
     " }}}
+    "call dein#add('taketwo/vim-ros')
+    autocmd BufNewFile, BufRead *.launch set syntax=xml
 
   " color
   set t_Co=256
@@ -738,7 +740,8 @@ set shell=/bin/bash
   " }}}
 
   call dein#add('wesQ3/vim-windowswap')
-  
+
+  call dein#add('junegunn/vim-peekaboo')
   " ./install --all so the interactive script doesn't block
   " you can check the other command line options  in the install file
   call dein#add('junegunn/fzf', { 'build': './install --all', 'merged': 0, 'rtp': '' }) 
@@ -1264,7 +1267,7 @@ runtime plugin/shortcut.vim
     call AutoHighlightToggle() " enable default autohighlighting
 
     Shortcut (indent-guides) toggle indent guides 
-        \ nnoremap <silent> <Leader>ti <Plug>IndentGuidesToggle
+        \ nnoremap <silent> <Leader>ti :IndentGuidesToggle<CR>
 
     Shortcut (tagbar) toggle tagbar 
         \ nnoremap <silent> <Leader>tt :TagbarToggle<CR>

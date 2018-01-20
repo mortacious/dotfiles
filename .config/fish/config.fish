@@ -16,6 +16,8 @@ set -x ALTERNATE_EDITOR ""
 alias config '/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
 set FZF_DEFAULT_COMMAND 'ag -g ""'
 set FZF_ALT_C_COMMAND 'bfs -type d -nohidden'
+set -x CUDA_ROOT /opt/cuda/bin
+set -x PATH $PATH $CUDA_ROOT
 
 fundle plugin 'edc/bass'
 fundle install > /dev/null
