@@ -69,4 +69,10 @@ end
 if test $BEDROCK_CONTEXT = "ubuntu-lts"
     bass source /bedrock/brpath/ros/kinetic/setup.bash 2>/dev/null
     source /bedrock/brpath/ros/kinetic/share/rosbash/rosfish
-end 
+end
+
+
+if status is-interactive
+and not set -q TMUX
+    exec tmux
+end
